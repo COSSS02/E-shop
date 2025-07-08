@@ -2,14 +2,14 @@
   "name": "e-shop",
   "version": "1.0.0",
   "description": "An e-commerce shop for PC components and other technologies",
-  "main": "index.js",
+  "main": "server.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:COSSS02/E-shop.git"
   },
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
+    "start": "node server.js",
+    "dev": "node --watch server.js",
     "build:client": "cd ../client && npm run build",
     "watch:client": "cd ../client && npm run build -- --watch",
     "dev:full": "npm run build:client && concurrently \"npm run dev\" \"npm run watch:client\""
@@ -17,7 +17,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^5.1.0"
+    "dotenv": "^17.1.0",
+    "express": "^5.1.0",
+    "mysql2": "^3.14.1"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"
