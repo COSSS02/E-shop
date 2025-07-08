@@ -1,0 +1,44 @@
+const Product = require('../models/products');
+
+const productController = {
+    /**
+     * Handles the creation of a new product.
+     */
+    async createProduct(req, res) {
+        try {
+            // Note: In a real app, you'd get provider_id from the authenticated user (req.user.id)
+            const { productData, attributesData } = req.body;
+
+            if (!productData || !attributesData) {
+                return res.status(400).json({ message: "Missing productData or attributesData in request body." });
+            }
+
+            const productId = await Product.create(productData, attributesData);
+            res.status(201).json({ message: "Product created successfully", productId });
+
+        } catch (error) {
+            res.status(500).json({ message: "Error creating product", error: error.message });
+        }
+    },
+
+    /**
+     * Handles retrieving a single product by its ID.
+     */
+    async getProductById(req, res) {
+        try {
+            const { id } = req.params;
+            const product = await Product.findById(id);
+
+            if (!product) {
+                return res.status(404).json({ message: "Product not found" });
+            }
+
+            res.status(200).json(product);
+
+        } catch (error) {
+            res.status(500).json({ message: "Error retrieving product", error: error.message });
+        }
+    }
+};
+
+module.exports = productController;

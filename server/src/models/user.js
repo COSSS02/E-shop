@@ -17,7 +17,7 @@ const User = {
 
         const sql = `
             INSERT INTO users (email, password_hash, first_name, last_name, role, company_name)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
 
         const [result] = await db.query(sql, [email, passwordHash, firstName, lastName, role || 'client', companyName || null]);
