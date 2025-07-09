@@ -6,12 +6,18 @@ const productController = {
      */
     async createProduct(req, res) {
         try {
+            // Get the provider's ID from the authenticated user's token.
+            const provider_id = req.user.id;
+
             // Note: In a real app, you'd get provider_id from the authenticated user (req.user.id)
             const { productData, attributesData } = req.body;
 
             if (!productData || !attributesData) {
                 return res.status(400).json({ message: "Missing productData or attributesData in request body." });
             }
+
+            // IMPORTANT: Overwrite any provider_id in the body with the one from the token.
+            productData.provider_id = provider_id;
 
             const productId = await Product.create(productData, attributesData);
             res.status(201).json({ message: "Product created successfully", productId });

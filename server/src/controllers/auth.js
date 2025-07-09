@@ -9,6 +9,12 @@ const authController = {
         try {
             const { email, password, firstName, lastName, role, companyName } = req.body;
 
+            // --- NEW SECURITY CHECK ---
+            // Prevent anyone from creating an admin account via the public registration endpoint.
+            if (role === 'admin') {
+                return res.status(403).json({ message: "Forbidden: Cannot create an admin user through this endpoint." });
+            }
+
             // Check if user already exists
             const existingUser = await User.findByEmail(email);
             if (existingUser) {
