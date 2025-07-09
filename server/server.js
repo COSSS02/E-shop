@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');
 const db = require('./src/config/db');
-const productRoutes = require('./src/routes/products');
 const authRoutes = require('./src/routes/auth');
 const addressRoutes = require('./src/routes/address');
+const productRoutes = require('./src/routes/products');
+const categoryRoutes = require('./src/routes/category');
 
 
 const app = express();
@@ -21,8 +22,9 @@ app.get("/api/test-db", async (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
 app.use('/api/address', addressRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 
 app.use(express.static(path.join(__dirname, '../client/dist')));
 

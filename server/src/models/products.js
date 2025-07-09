@@ -24,11 +24,18 @@ const Product = {
 
             // 2. Handle the attributes
             for (const attr of attributesData) {
-                // Find or create the attribute's ID
-                let [rows] = await connection.query('SELECT id FROM attributes WHERE name = ?', [attr.attributeName]);
+                // Find or create the attribute's ID, now scoped to the product's category
+                let [rows] = await connection.query(
+                    'SELECT id FROM attributes WHERE name = ? AND category_id = ?',
+                    [attr.attributeName, category_id]
+                );
                 let attributeId;
                 if (rows.length === 0) {
-                    const [attrResult] = await connection.query('INSERT INTO attributes (name) VALUES (?)', [attr.attributeName]);
+                    // Create the attribute, now including the category_id
+                    const [attrResult] = await connection.query(
+                        'INSERT INTO attributes (name, category_id) VALUES (?, ?)',
+                        [attr.attributeName, category_id]
+                    );
                     attributeId = attrResult.insertId;
                 } else {
                     attributeId = rows[0].id;
