@@ -11,12 +11,12 @@
 }
 
 .hamburger-menu:focus {
-    outline: none;
+    outline:none;
 }
 
 .hamburger-line {
     width: 1.5rem;
-    height: 0.2rem;
-    background: white;
+    height: 0.21rem;
+    background: #2C2C2C;
     border-radius: 10px;
 }
