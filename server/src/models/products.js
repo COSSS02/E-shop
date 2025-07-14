@@ -93,6 +93,24 @@ const Product = {
 
         product.attributes = attributeRows; // Attach attributes to the product object
         return product;
+    },
+
+       /**
+     * Finds all products.
+     * @returns {Promise<Array>} An array of product objects.
+     */
+    async findAll() {
+        // This query joins to get the category name and a product image if you add an images table later.
+        const sql = `
+            SELECT
+                p.id, p.name, p.description, p.price, p.stock_quantity,
+                c.name as category_name
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            ORDER BY p.created_at DESC
+        `;
+        const [rows] = await db.query(sql);
+        return rows;
     }
 };
 

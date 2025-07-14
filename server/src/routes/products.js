@@ -8,6 +8,8 @@ const checkRole = require('../middleware/role');
 // Note: You would add authentication middleware here to protect this route
 router.post('/', authMiddleware, checkRole(['provider', 'admin']), productController.createProduct);
 
+router.get('/', productController.getAllProducts);
+
 // GET /api/products/:id - Get a single product by its ID
 router.get('/:id', productController.getProductById);
 
