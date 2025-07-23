@@ -11,3 +11,16 @@ export const getAllProducts = async () => {
         throw error;
     }
 };
+
+export const getProductById = async (productId) => {
+    try {
+        const response = await fetch(`/api/products/${productId}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Failed to fetch product with ID ${productId}:`, error);
+        throw error;
+    }
+}
