@@ -1,8 +1,13 @@
+main:has(.login-container) {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 2rem;
+    height: 100vh;
 }
 
 .login-form {
@@ -39,6 +44,12 @@
     box-sizing: border-box;
 }
 
+.form-group input:focus {
+    outline: none;
+    border-color: rgb(255, 63, 98);
+    box-shadow: 0 0 5px rgba(82, 37, 70, 0.5);
+}
+
 .login-button {
     width: 100%;
     padding: 0.75rem;
@@ -64,4 +75,8 @@
 .register-link a {
     color: #e67e22;
     text-decoration: none;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import Logo from '../../assets/logo.svg';
 import Hamburger from '../hamburger/Hamburger';
 import SideMenu from '../sidemenu/SideMenu';
@@ -7,6 +8,7 @@ import './Navbar.css';
 
 function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { user, logout } = useAuth();
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -29,8 +31,18 @@ function Navbar() {
                 </div>
 
                 <div className="nav-links">
-                    <Link to="/login">Login</Link>
-                    <Link to="/cart">Cart</Link>
+                    {user ? (
+                        <>
+                            <span className="welcome-message">Welcome, {user.firstName}</span>
+                            <Link to="/cart" className="nav-button">Cart</Link>
+                            <button onClick={logout} className="nav-button logout-button">Logout</button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/login" className="nav-button">Login</Link>
+                            <Link to="/register" className="nav-button">Register</Link>
+                        </>
+                    )}
                 </div>
             </nav>
             <SideMenu isOpen={isMenuOpen} closeMenu={() => setIsMenuOpen(false)} />
