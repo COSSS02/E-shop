@@ -95,6 +95,25 @@ const Product = {
         return product;
     },
 
+    /**
+     * Finds all products belonging to a specific category name.
+     * @param {string} categoryName - The name of the category.
+     * @returns {Promise<Array>} An array of product objects.
+     */
+    async findByCategoryName(categoryName) {
+        const sql = `
+            SELECT
+                p.id, p.name, p.description, p.price, p.stock_quantity,
+                c.name as category_name
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            WHERE c.name = ?
+            ORDER BY p.created_at DESC
+        `;
+        const [rows] = await db.query(sql, [categoryName]);
+        return rows;
+    },
+
        /**
      * Finds all products.
      * @returns {Promise<Array>} An array of product objects.

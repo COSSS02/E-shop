@@ -46,6 +46,19 @@ const productController = {
         }
     },
 
+    /**
+     * Handles retrieving all products for a given category.
+     */
+    async getProductsByCategory(req, res) {
+        try {
+            const { categoryName } = req.params;
+            const products = await Product.findByCategoryName(categoryName);
+            res.status(200).json(products);
+        } catch (error) {
+            res.status(500).json({ message: "Error retrieving products by category", error: error.message });
+        }
+    },
+
     async getAllProducts(req, res) {
         try {
             const products = await Product.findAll();

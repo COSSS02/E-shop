@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getAllCategories } from '../../api/categories';
 import './SideMenu.css';
 
 function SideMenu({ isOpen, closeMenu }) {
-    // When a link is clicked, close the menu
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        // Fetch categories only when the menu is opened for the first time
+        if (isOpen && categories.length === 0) {
+            getAllCategories()
+                .then(data => setCategories(data))
+                .catch(err => console.error("Could not load categories for side menu.", err));
+        }
+    }, [isOpen, categories.length]);
+
     const handleLinkClick = () => {
         closeMenu();
     };
@@ -20,9 +31,16 @@ function SideMenu({ isOpen, closeMenu }) {
                 </div>
                 <div className="side-menu-links">
                     <Link to="/" onClick={handleLinkClick}>Home</Link>
-                    <Link to="/products" onClick={handleLinkClick}>All Products</Link>
-                    <Link to="/categories/cpu" onClick={handleLinkClick}>CPUs</Link>
-                    <Link to="/categories/gpu" onClick={handleLinkClick}>Graphics Cards</Link>
+                    <hr className="divider" />
+                    {categories.map(category => (
+                        <Link
+                            key={category.id}
+                            to={`/categories/${encodeURIComponent(category.name)}`}
+                            onClick={handleLinkClick}
+                        >
+                            {category.name}
+                        </Link>
+                    ))}
                 </div>
             </div>
         </>

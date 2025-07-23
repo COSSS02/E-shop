@@ -10,6 +10,9 @@ router.post('/', authMiddleware, checkRole(['provider', 'admin']), productContro
 
 router.get('/', productController.getAllProducts);
 
+// GET /api/products/category/:categoryName - Get all products for a category
+router.get('/category/:categoryName', productController.getProductsByCategory);
+
 // GET /api/products/:id - Get a single product by its ID
 router.get('/:id', productController.getProductById);
 

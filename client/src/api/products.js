@@ -24,3 +24,16 @@ export const getProductById = async (productId) => {
         throw error;
     }
 }
+
+export const getProductsByCategory = async (categoryName) => {
+    try {
+        const response = await fetch(`/api/products/category/${encodeURIComponent(categoryName)}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Failed to fetch products for category ${categoryName}:`, error);
+        throw error;
+    }
+};
