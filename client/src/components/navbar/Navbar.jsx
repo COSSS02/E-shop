@@ -49,7 +49,7 @@ function Navbar() {
                 <div className="nav-links">
                     {user ? (
                         <>
-                            <span className="welcome-message">Welcome, {user.firstName}</span>
+                            <Link to="/profile" className="nav-button">Profile</Link>
                             <Link to="/cart" className="nav-button">Cart</Link>
                             <button onClick={logout} className="nav-button logout-button">Logout</button>
                         </>

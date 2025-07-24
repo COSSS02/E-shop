@@ -44,3 +44,19 @@ export const loginUser = async (credentials) => {
         throw error;
     }
 };
+
+export const upgradeToProvider = async (providerData, token) => {
+    const response = await fetch('/api/auth/upgrade-to-provider', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(providerData)
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upgrade account.');
+    }
+    return await response.json();
+};

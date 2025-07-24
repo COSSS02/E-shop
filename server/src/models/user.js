@@ -45,6 +45,19 @@ const User = {
         };
 
         return user;
+    },
+
+    /**
+     * Updates a user's role and company name.
+     * @param {number} userId - The ID of the user to update.
+     * @param {string} role - The new role for the user.
+     * @param {string} companyName - The user's company name.
+     * @returns {Promise<object>} The result from the database update.
+     */
+    async updateRoleAndCompany(userId, role, companyName) {
+        const sql = `UPDATE users SET role = ?, company_name = ? WHERE id = ?`;
+        const [result] = await db.query(sql, [role, companyName, userId]);
+        return result;
     }
 };
 

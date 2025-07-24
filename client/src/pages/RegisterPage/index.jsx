@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../../api/auth';
+import Logo from '../../assets/logo.svg';
 import './style.css';
 
 function RegisterPage() {
@@ -36,6 +37,12 @@ function RegisterPage() {
 
     return (
         <div className="register-container">
+            <div className="auth-header">
+                <Link to="/">
+                    <img src={Logo} alt="Tech-Shop Logo" className="auth-logo" />
+                    <span>Tech-Shop</span>
+                </Link>
+            </div>
             <form className="register-form" onSubmit={handleSubmit}>
                 <h2>Create an Account</h2>
                 {error && <p className="error-message">{error}</p>}

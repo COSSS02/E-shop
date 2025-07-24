@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import Logo from '../../assets/logo.svg';
 import './style.css';
 
 function LoginPage() {
@@ -30,6 +31,12 @@ function LoginPage() {
 
     return (
         <div className="login-container">
+            <div className="auth-header">
+                <Link to="/">
+                    <img src={Logo} alt="Tech-Shop Logo" className="auth-logo" />
+                    <span>Tech-Shop</span>
+                </Link>
+            </div>
             <form className="login-form" onSubmit={handleSubmit}>
                 <h2>Login</h2>
                 {registrationMessage && <p className="success-message">{registrationMessage}</p>}

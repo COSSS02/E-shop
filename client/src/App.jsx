@@ -5,7 +5,9 @@ import RegisterPage from './pages/RegisterPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CategoryPage from './pages/CategoryPage';
 import SearchPage from './pages/SearchPage';
+import ProfilePage from './pages/ProfilePage';
 import Layout from './components/layout/Layout';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import './App.css'
 
 function App() {
@@ -20,6 +22,13 @@ function App() {
           <Route path="/products/:productId" element={<ProductDetailPage />} />
           <Route path="/categories/:categoryName" element={<CategoryPage />} />
           <Route path="/search" element={<SearchPage />} />
+
+          {/* Protected Routes */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
         </Routes>
       </Layout>
       {/* A Footer component could go here */}

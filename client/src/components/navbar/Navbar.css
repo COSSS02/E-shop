@@ -24,10 +24,11 @@
     font-weight: bold;
     color: rgb(220, 220, 220);
     text-decoration: none;
+    transition: color 0.2s;
 }
 
 .navbar-brand:hover {
-    color: rgb(255, 63, 98);
+    color: #E67E22;
 }
 
 .navbar-logo {

@@ -18,7 +18,14 @@ export const AuthProvider = ({ children }) => {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 // Check if the token is expired
                 if (payload.exp * 1000 > Date.now()) {
-                    setUser({ id: payload.id, email: payload.email, role: payload.role, firstName: payload.firstName });
+                    setUser({
+                        id: payload.id,
+                        email: payload.email,
+                        role: payload.role,
+                        firstName: payload.firstName,
+                        lastName: payload.lastName,
+                        companyName: payload.companyName
+                    });
                 } else {
                     // Token is expired, clear it
                     localStorage.removeItem('token');
