@@ -37,3 +37,16 @@ export const getProductsByCategory = async (categoryName) => {
         throw error;
     }
 };
+
+export const searchProducts = async (query) => {
+    try {
+        const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Failed to search for products with query "${query}":`, error);
+        throw error;
+    }
+};

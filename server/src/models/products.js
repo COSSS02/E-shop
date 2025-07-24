@@ -96,6 +96,26 @@ const Product = {
     },
 
     /**
+     * Searches for products by name or description.
+     * @param {string} searchTerm - The term to search for.
+     * @returns {Promise<Array>} An array of matching product objects.
+     */
+    async search(searchTerm) {
+        const sql = `
+            SELECT
+                p.id, p.name, p.description, p.price, p.stock_quantity,
+                c.name as category_name
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            WHERE p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?
+            ORDER BY p.created_at DESC
+        `;
+        const searchPattern = `%${searchTerm}%`;
+        const [rows] = await db.query(sql, [searchPattern, searchPattern, searchPattern]);
+        return rows;
+    },
+
+    /**
      * Finds all products belonging to a specific category name.
      * @param {string} categoryName - The name of the category.
      * @returns {Promise<Array>} An array of product objects.

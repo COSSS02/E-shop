@@ -47,6 +47,22 @@ const productController = {
     },
 
     /**
+     * Handles searching for products.
+     */
+    async searchProducts(req, res) {
+        try {
+            const { q } = req.query;
+            if (!q) {
+                return res.status(400).json({ message: "Search query 'q' is required." });
+            }
+            const products = await Product.search(q);
+            res.status(200).json(products);
+        } catch (error) {
+            res.status(500).json({ message: "Error searching for products", error: error.message });
+        }
+    },
+
+    /**
      * Handles retrieving all products for a given category.
      */
     async getProductsByCategory(req, res) {

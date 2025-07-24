@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CategoryPage from './pages/CategoryPage';
+import SearchPage from './pages/SearchPage';
 import Layout from './components/layout/Layout';
 import './App.css'
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/products/:productId" element={<ProductDetailPage />} />
           <Route path="/categories/:categoryName" element={<CategoryPage />} />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
       </Layout>
       {/* A Footer component could go here */}

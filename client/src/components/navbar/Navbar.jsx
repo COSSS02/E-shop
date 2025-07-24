@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Logo from '../../assets/logo.svg';
 import Hamburger from '../hamburger/Hamburger';
@@ -8,10 +8,20 @@ import './Navbar.css';
 
 function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchTerm.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+            setSearchTerm('');
+        }
     };
 
     return (
@@ -25,10 +35,16 @@ function Navbar() {
                     </Link>
                 </div>
 
-                <div className="search-container">
-                    <input type="text" className="search-input" placeholder="Search for products..." />
-                    <button className="search-button">Search</button>
-                </div>
+                <form className="search-container" onSubmit={handleSearchSubmit}>
+                    <input
+                        type="text"
+                        className="search-input"
+                        placeholder="Search for products..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <button type="submit" className="search-button">Search</button>
+                </form>
 
                 <div className="nav-links">
                     {user ? (
