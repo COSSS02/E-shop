@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllProducts } from '../../api/products';
 import ProductList from '../../components/products/ProductList';
+import './style.css';
 
 function HomePage() {
     const [products, setProducts] = useState([]);
@@ -24,7 +25,8 @@ function HomePage() {
 
     return (
         <div>
-            <h1>Featured Products</h1>
+            <h1 className='home-page-title'>Featured Products</h1>
+            <p className='home-page-description'>Explore our latest products below</p>
 
             {loading && <p>Loading products...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}

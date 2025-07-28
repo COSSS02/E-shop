@@ -7,6 +7,7 @@ import './style.css';
 function CategoryPage() {
     const { categoryName } = useParams();
     const [products, setProducts] = useState([]);
+    const [category, setCategory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -15,7 +16,8 @@ function CategoryPage() {
             try {
                 setLoading(true);
                 const data = await getProductsByCategory(categoryName);
-                setProducts(data);
+                setProducts(data.products);
+                setCategory(data.category);
             } catch (err) {
                 setError(`Failed to load products for ${categoryName}.`);
             } finally {
@@ -29,6 +31,7 @@ function CategoryPage() {
     return (
         <div className="category-page-container">
             <h1>{categoryName}</h1>
+            {category && <p className="category-description">{category.description}</p>}
 
             {loading && <p>Loading products...</p>}
             {error && <p className="error-message">{error}</p>}

@@ -14,6 +14,17 @@ const Category = {
     },
 
     /**
+     * Finds a single category by its name.
+     * @param {string} categoryName - The name of the category.
+     * @returns {Promise<object|null>} The category object or null if not found.
+     */
+    async findByName(categoryName) {
+        const sql = `SELECT * FROM categories WHERE name = ?`;
+        const [rows] = await db.query(sql, [categoryName]);
+        return rows.length > 0 ? rows[0] : null;
+    },
+
+    /**
      * Finds all categories.
      * @returns {Promise<Array>} An array of all category objects.
      */

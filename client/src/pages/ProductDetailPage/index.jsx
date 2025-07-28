@@ -48,7 +48,17 @@ function ProductDetailPage() {
 
                 <div className="product-purchase-section">
                     <span className="product-price-large">${product.price}</span>
-                    <button className="add-to-cart-btn">Add to Cart</button>
+                    <div className="purchase-actions">
+                        <span className={`product-stock-status ${product.stock_quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
+                            {product.stock_quantity > 0 ? `In Stock: ${product.stock_quantity}` : 'Out of Stock'}
+                        </span>
+                        <button
+                            className="add-to-cart-btn"
+                            disabled={product.stock_quantity === 0}
+                        >
+                            Add to Cart
+                        </button>
+                    </div>
                 </div>
 
                 <div className="product-attributes">

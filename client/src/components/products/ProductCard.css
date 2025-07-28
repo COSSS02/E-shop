@@ -21,13 +21,25 @@
 .product-name {
     font-size: 1.2rem;
     margin: 0.5rem 0;
+    /* text-align: center; */
+}
+
+.product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
 .product-price {
     font-size: 1.1rem;
     font-weight: bold;
     color: #e67e22;
-    margin-bottom: 1rem;
+}
+
+.product-quantity {
+    font-size: 1.1rem;
+    font-weight: bold;
 }
 
 .view-details-btn {
