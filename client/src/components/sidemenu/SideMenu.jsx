@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllCategories } from '../../api/categories';
+import { useAuth } from '../../contexts/AuthContext';
 import './SideMenu.css';
 
 function SideMenu({ isOpen, closeMenu }) {
     const [categories, setCategories] = useState([]);
+    const { user } = useAuth();
 
     useEffect(() => {
         // Fetch categories only when the menu is opened for the first time
@@ -31,6 +33,13 @@ function SideMenu({ isOpen, closeMenu }) {
                 </div>
                 <div className="side-menu-links">
                     <Link to="/" onClick={handleLinkClick}>Home</Link>
+                    {user && user.role === 'admin' && (
+                        <>
+                            <Link to="/admin/add-category" onClick={handleLinkClick} className="admin-link">
+                                Add Category
+                            </Link>
+                        </>
+                    )}
                     <hr className="divider" />
                     {categories.map(category => (
                         <Link

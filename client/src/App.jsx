@@ -6,6 +6,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import CategoryPage from './pages/CategoryPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
+import AddCategoryPage from './pages/AddCategoryPage';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './App.css'
@@ -27,6 +28,11 @@ function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/add-category" element={
+            <ProtectedRoute roles={['admin']}>
+              <AddCategoryPage />
             </ProtectedRoute>
           } />
         </Routes>
