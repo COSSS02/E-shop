@@ -50,3 +50,25 @@ export const searchProducts = async (query) => {
         throw error;
     }
 };
+
+export const createProduct = async (productPayload, token) => {
+    try {
+        const response = await fetch('/api/products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(productPayload)
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to create product.');
+        }
+        return data;
+    } catch (error) {
+        console.error("Failed to create product:", error);
+        throw error;
+    }
+};

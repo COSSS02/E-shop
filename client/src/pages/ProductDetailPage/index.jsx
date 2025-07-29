@@ -41,7 +41,14 @@ function ProductDetailPage() {
         <div className="product-detail-container">
             <div className="product-detail-card">
                 <div className="product-detail-header">
-                    <h1 className="product-title">{product.name}</h1>
+                    <div>
+                        <h1 className="product-title">{product.name}</h1>
+                        {product.provider_name && (
+                            <div className="product-provider">
+                                Sold by: {product.provider_name}
+                            </div>
+                        )}
+                    </div>
                     <span className="product-category">{product.category_name}</span>
                 </div>
                 <p className="product-description">{product.description}</p>

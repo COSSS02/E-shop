@@ -24,6 +24,16 @@ const Product = {
 
             // 2. Handle the attributes
             for (const attr of attributesData) {
+                // Skip if attribute name or value is empty
+                if (!attr.attributeName || !attr.value) continue;
+
+                // Capitalize the first letter of each word in the attribute name
+                const capitalizedAttrName = attr.attributeName
+                    .toLowerCase()
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+
                 // Find or create the attribute's ID, now scoped to the product's category
                 let [rows] = await connection.query(
                     'SELECT id FROM attributes WHERE name = ? AND category_id = ?',
@@ -69,9 +79,10 @@ const Product = {
     async findById(productId) {
         // 1. Get the core product details
         const productSql = `
-            SELECT p.*, c.name as category_name
+            SELECT p.*, c.name as category_name, u.company_name as provider_name
             FROM products p
             JOIN categories c ON p.category_id = c.id
+            JOIN users u ON p.provider_id = u.id
             WHERE p.id = ?
         `;
         const [productRows] = await db.query(productSql, [productId]);

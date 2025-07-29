@@ -30,3 +30,18 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
+
+input {
+  padding: 0.75rem;
+  border: 1px solid #555;
+  background-color: #2c2c2c;
+  color: white;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  border-color: rgb(255, 63, 98);
+  box-shadow: 0 0 5px rgba(82, 37, 70, 0.5);
+}

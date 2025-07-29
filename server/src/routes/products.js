@@ -6,7 +6,7 @@ const checkRole = require('../middleware/role');
 
 // POST /api/products - Create a new product
 // Note: You would add authentication middleware here to protect this route
-router.post('/', authMiddleware, checkRole(['provider', 'admin']), productController.createProduct);
+router.post('/', authMiddleware, checkRole(['provider']), productController.createProduct);
 
 router.get('/', productController.getAllProducts);
 
