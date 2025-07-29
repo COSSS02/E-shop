@@ -127,12 +127,24 @@ const Product = {
     },
 
     /**
-     * Finds all products belonging to a specific category name.
+     * Finds all products belonging to a specific category name with pagination.
      * @param {string} categoryName - The name of the category.
-     * @returns {Promise<Array>} An array of product objects.
+     * @param {number} limit - The number of products to return per page.
+     * @param {number} offset - The number of products to skip.
+     * @returns {Promise<object>} An object containing the products array and the total count for that category.
      */
-    async findByCategoryName(categoryName) {
-        const sql = `
+    async findByCategoryName(categoryName, limit, offset) {
+        // Get total count for the specific category
+        const countSql = `
+            SELECT COUNT(*) as total
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            WHERE c.name = ?
+        `;
+        const [[{ total }]] = await db.query(countSql, [categoryName]);
+
+        // Get paginated products for the category
+        const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
                 c.name as category_name
@@ -140,27 +152,39 @@ const Product = {
             JOIN categories c ON p.category_id = c.id
             WHERE c.name = ?
             ORDER BY p.created_at DESC
+            LIMIT ?
+            OFFSET ?
         `;
-        const [rows] = await db.query(sql, [categoryName]);
-        return rows;
+        const [products] = await db.query(productsSql, [categoryName, limit, offset]);
+
+        return { products, totalProducts: total };
     },
 
-       /**
-     * Finds all products.
-     * @returns {Promise<Array>} An array of product objects.
-     */
-    async findAll() {
-        // This query joins to get the category name and a product image if you add an images table later.
-        const sql = `
+    /**
+    * Finds all products with pagination.
+    * @param {number} limit - The number of products to return per page.
+    * @param {number} offset - The number of products to skip.
+    * @returns {Promise<object>} An object containing the products array and the total count.
+    */
+    async findAll(limit, offset) {
+        // First, get the total count of all products for pagination metadata
+        const countSql = `SELECT COUNT(*) as total FROM products`;
+        const [[{ total }]] = await db.query(countSql);
+
+        // Then, get the paginated list of products
+        const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
                 c.name as category_name
             FROM products p
             JOIN categories c ON p.category_id = c.id
             ORDER BY p.created_at DESC
+            LIMIT ?
+            OFFSET ?
         `;
-        const [rows] = await db.query(sql);
-        return rows;
+        const [products] = await db.query(productsSql, [limit, offset]);
+
+        return { products, totalProducts: total };
     }
 };
 

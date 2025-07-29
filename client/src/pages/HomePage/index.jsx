@@ -7,21 +7,39 @@ function HomePage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pagination, setPagination] = useState(null);
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const data = await getAllProducts();
-                setProducts(data);
+                setLoading(true);
+                const data = await getAllProducts(currentPage);
+                setProducts(data.products);
+                setPagination(data.pagination);
             } catch (err) {
-                setError('Failed to load products. Please try again later.');
+                setError("Failed to load products. Please try again later.");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchProducts();
-    }, []); // The empty array ensures this effect runs only once on mount
+        // Scroll to top when page changes
+        window.scrollTo(0, 0);
+    }, [currentPage]);
+
+    const handleNextPage = () => {
+        if (currentPage < pagination.totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
 
     return (
         <div>
@@ -30,7 +48,24 @@ function HomePage() {
 
             {loading && <p>Loading products...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            {!loading && !error && <ProductList products={products} />}
+            {!loading && !error && (
+                <>
+                    <ProductList products={products} />
+                    {pagination && pagination.totalPages > 1 && (
+                        <div className="pagination-controls">
+                            <button onClick={handlePrevPage} disabled={currentPage === 1}>
+                                &laquo; Previous
+                            </button>
+                            <span>
+                                Page {pagination.currentPage} of {pagination.totalPages}
+                            </span>
+                            <button onClick={handleNextPage} disabled={currentPage === pagination.totalPages}>
+                                Next &raquo;
+                            </button>
+                        </div>
+                    )}
+                </>
+            )}
         </div>
     );
 }

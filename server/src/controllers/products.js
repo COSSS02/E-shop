@@ -69,14 +69,31 @@ const productController = {
     async getProductsByCategory(req, res) {
         try {
             const { categoryName } = req.params;
+            const limit = parseInt(req.query.limit, 10) || 20;
+            const page = parseInt(req.query.page, 10) || 1;
+            const offset = (page - 1) * limit;
 
+            // 1. Find the category details (including description)
             const category = await Category.findByName(categoryName);
             if (!category) {
                 return res.status(404).json({ message: "Category not found" });
             }
 
-            const products = await Product.findByCategoryName(categoryName);
-            res.status(200).json({ category, products });
+            // 2. Find all products in that category with pagination
+            const { products, totalProducts } = await Product.findByCategoryName(categoryName, limit, offset);
+
+            // 3. Send both back to the client with pagination info
+            res.status(200).json({
+                category,
+                products,
+                pagination: {
+                    currentPage: page,
+                    totalPages: Math.ceil(totalProducts / limit),
+                    totalProducts,
+                    limit
+                }
+            });
+
         } catch (error) {
             res.status(500).json({ message: "Error retrieving products by category", error: error.message });
         }
@@ -84,8 +101,23 @@ const productController = {
 
     async getAllProducts(req, res) {
         try {
-            const products = await Product.findAll();
-            res.status(200).json(products);
+            // Set default limit to 20, can be overridden by query param
+            const limit = parseInt(req.query.limit, 10) || 20;
+            // Get page from query param, default to page 1
+            const page = parseInt(req.query.page, 10) || 1;
+            const offset = (page - 1) * limit;
+
+            const { products, totalProducts } = await Product.findAll(limit, offset);
+
+            res.status(200).json({
+                products,
+                pagination: {
+                    currentPage: page,
+                    totalPages: Math.ceil(totalProducts / limit),
+                    totalProducts,
+                    limit
+                }
+            });
         } catch (error) {
             res.status(500).json({ message: "Error retrieving products", error: error.message });
         }
