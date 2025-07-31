@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { getAllProducts } from '../../api/products';
 import ProductList from '../../components/products/ProductList';
 import './style.css';
@@ -7,8 +8,10 @@ function HomePage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
     const [pagination, setPagination] = useState(null);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -31,13 +34,13 @@ function HomePage() {
 
     const handleNextPage = () => {
         if (currentPage < pagination.totalPages) {
-            setCurrentPage(currentPage + 1);
+            setSearchParams({ page: currentPage + 1 });
         }
     };
 
     const handlePrevPage = () => {
         if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
+            setSearchParams({ page: currentPage - 1 });
         }
     };
 
