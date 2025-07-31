@@ -38,9 +38,9 @@ export const getProductsByCategory = async (categoryName, page = 1) => {
     }
 };
 
-export const searchProducts = async (query) => {
+export const searchProducts = async (query, page = 1) => {
     try {
-        const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&page=${page}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

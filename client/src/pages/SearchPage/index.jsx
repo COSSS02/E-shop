@@ -5,9 +5,12 @@ import ProductList from '../../components/products/ProductList';
 import './style.css';
 
 function SearchPage() {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const query = searchParams.get('q');
+    const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
     const [products, setProducts] = useState([]);
+    const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -22,8 +25,9 @@ function SearchPage() {
             try {
                 setLoading(true);
                 setError(null);
-                const data = await searchProducts(query);
-                setProducts(data);
+                const data = await searchProducts(query, currentPage);
+                setProducts(data.products);
+                setPagination(data.pagination);
             } catch (err) {
                 setError(`Failed to search for "${query}".`);
             } finally {
@@ -32,7 +36,12 @@ function SearchPage() {
         };
 
         fetchSearchResults();
-    }, [query]);
+        window.scrollTo(0, 0);
+    }, [query, currentPage]);
+
+    const handlePageChange = (newPage) => {
+        setSearchParams({ q: query, page: newPage });
+    };
 
     return (
         <div className="search-page-container">
@@ -41,9 +50,25 @@ function SearchPage() {
             {loading && <p>Searching...</p>}
             {error && <p className="error-message">{error}</p>}
             {!loading && !error && (
-                products.length > 0
-                    ? <ProductList products={products} />
-                    : <p>No products found matching your search.</p>
+                <>
+                    {products.length > 0
+                        ? <ProductList products={products} />
+                        : <p>No products found matching your search.</p>
+                    }
+                    {pagination && pagination.totalPages > 1 && (
+                        <div className="pagination-controls">
+                            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                                &laquo; Previous
+                            </button>
+                            <span>
+                                Page {pagination.currentPage} of {pagination.totalPages}
+                            </span>
+                            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === pagination.totalPages}>
+                                Next &raquo;
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );

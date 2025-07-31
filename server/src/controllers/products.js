@@ -56,8 +56,22 @@ const productController = {
             if (!q) {
                 return res.status(400).json({ message: "Search query 'q' is required." });
             }
-            const products = await Product.search(q);
-            res.status(200).json(products);
+
+            const limit = parseInt(req.query.limit, 10) || 12;
+            const page = parseInt(req.query.page, 10) || 1;
+            const offset = (page - 1) * limit;
+
+            const { products, totalProducts } = await Product.search(q, limit, offset);
+
+            res.status(200).json({
+                products,
+                pagination: {
+                    currentPage: page,
+                    totalPages: Math.ceil(totalProducts / limit),
+                    totalProducts,
+                    limit
+                }
+            });
         } catch (error) {
             res.status(500).json({ message: "Error searching for products", error: error.message });
         }

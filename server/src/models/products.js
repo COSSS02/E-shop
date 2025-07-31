@@ -107,23 +107,40 @@ const Product = {
     },
 
     /**
-     * Searches for products by name or description.
+        * Searches for products by name or description with pagination.
      * @param {string} searchTerm - The term to search for.
-     * @returns {Promise<Array>} An array of matching product objects.
+     * @param {number} limit - The number of products to return per page.
+     * @param {number} offset - The number of products to skip.
+     * @returns {Promise<object>} An object containing the products array and the total count.
      */
-    async search(searchTerm) {
-        const sql = `
+    async search(searchTerm, limit, offset) {
+        const searchPattern = `%${searchTerm}%`;
+        const commonWhereClause = `WHERE p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?`;
+
+        // First, get the total count of matching products
+        const countSql = `
+            SELECT COUNT(*) as total
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            ${commonWhereClause}
+        `;
+        const [[{ total }]] = await db.query(countSql, [searchPattern, searchPattern, searchPattern]);
+
+        // Then, get the paginated list of products
+        const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
                 c.name as category_name
             FROM products p
             JOIN categories c ON p.category_id = c.id
-            WHERE p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?
+            ${commonWhereClause}
             ORDER BY p.created_at DESC
+            LIMIT ?
+            OFFSET ?
         `;
-        const searchPattern = `%${searchTerm}%`;
-        const [rows] = await db.query(sql, [searchPattern, searchPattern, searchPattern]);
-        return rows;
+        const [products] = await db.query(productsSql, [searchPattern, searchPattern, searchPattern, limit, offset]);
+
+        return { products, totalProducts: total };
     },
 
     /**
