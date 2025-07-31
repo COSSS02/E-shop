@@ -69,7 +69,7 @@ const productController = {
     async getProductsByCategory(req, res) {
         try {
             const { categoryName } = req.params;
-            const limit = parseInt(req.query.limit, 10) || 20;
+            const limit = parseInt(req.query.limit, 10) || 12;
             const page = parseInt(req.query.page, 10) || 1;
             const offset = (page - 1) * limit;
 
@@ -102,7 +102,7 @@ const productController = {
     async getAllProducts(req, res) {
         try {
             // Set default limit to 20, can be overridden by query param
-            const limit = parseInt(req.query.limit, 10) || 20;
+            const limit = parseInt(req.query.limit, 10) || 12;
             // Get page from query param, default to page 1
             const page = parseInt(req.query.page, 10) || 1;
             const offset = (page - 1) * limit;

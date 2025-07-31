@@ -36,8 +36,16 @@ function AddProductPage() {
     useEffect(() => {
         if (categoryId) {
             getAttributesByCategoryId(categoryId, token)
-                .then(setCategoryAttributes)
-                .catch(() => setError("Could not load attribute suggestions."));
+                .then(data => {
+                    // This is the correct place to log the fetched data
+                    console.log("Fetched attributes for this category:", data);
+                    setCategoryAttributes(data);
+                })
+                .catch(err => {
+                    // This will show the actual error in the console if something goes wrong
+                    console.error("Failed to fetch attributes:", err);
+                    setError("Could not load attribute suggestions.");
+                });
         } else {
             setCategoryAttributes([]);
         }
@@ -136,6 +144,7 @@ function AddProductPage() {
                                 onChange={e => handleAttributeChange(index, e)}
                                 list="attribute-suggestions"
                                 disabled={!categoryId}
+                                autoComplete='off'
                             />
                             <datalist id="attribute-suggestions">
                                 {categoryAttributes.map(catAttr => <option key={catAttr.id} value={catAttr.name} />)}
