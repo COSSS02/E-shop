@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getProductsByCategory } from '../../api/products';
 import ProductList from '../../components/products/ProductList';
+import Pagination from '../../components/pagination/Pagination';
 import './style.css';
 
 function CategoryPage() {
@@ -20,6 +21,14 @@ function CategoryPage() {
             try {
                 setLoading(true);
                 const data = await getProductsByCategory(categoryName, currentPage);
+
+                // Validate the page number after fetching
+                const { totalPages } = data.pagination;
+                if (totalPages > 0 && currentPage > totalPages) {
+                    setSearchParams({ page: totalPages });
+                    return;
+                }
+
                 setProducts(data.products);
                 setCategory(data.category);
                 setPagination(data.pagination);
@@ -34,16 +43,8 @@ function CategoryPage() {
         window.scrollTo(0, 0);
     }, [categoryName, currentPage]);
 
-    const handleNextPage = () => {
-        if (currentPage < pagination.totalPages) {
-            setSearchParams({ page: currentPage + 1 });
-        }
-    };
-
-    const handlePrevPage = () => {
-        if (currentPage > 1) {
-            setSearchParams({ page: currentPage - 1 });
-        }
+    const handlePageChange = (newPage) => {
+        setSearchParams({ page: newPage });
     };
 
     return (
@@ -59,18 +60,12 @@ function CategoryPage() {
                         ? <ProductList products={products} />
                         : <p>No products found in this category.</p>
                     }
-                    {pagination && pagination.totalPages > 1 && (
-                        <div className="pagination-controls">
-                            <button onClick={handlePrevPage} disabled={currentPage === 1}>
-                                &laquo; Previous
-                            </button>
-                            <span>
-                                Page {pagination.currentPage} of {pagination.totalPages}
-                            </span>
-                            <button onClick={handleNextPage} disabled={currentPage === pagination.totalPages}>
-                                Next &raquo;
-                            </button>
-                        </div>
+                    {pagination && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={pagination.totalPages}
+                            onPageChange={handlePageChange}
+                        />
                     )}
                 </>
             )}

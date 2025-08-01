@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getAllProducts } from '../../api/products';
 import ProductList from '../../components/products/ProductList';
+import Pagination from '../../components/pagination/Pagination';
 import './style.css';
 
 function HomePage() {
@@ -18,6 +19,15 @@ function HomePage() {
             try {
                 setLoading(true);
                 const data = await getAllProducts(currentPage);
+
+                // Validate the page number after fetching
+                const { totalPages } = data.pagination;
+                if (totalPages > 0 && currentPage > totalPages) {
+                    // If page is too high, go to the last page
+                    setSearchParams({ page: totalPages });
+                    return; // Stop execution to avoid rendering with invalid data
+                }
+
                 setProducts(data.products);
                 setPagination(data.pagination);
             } catch (err) {
@@ -32,40 +42,27 @@ function HomePage() {
         window.scrollTo(0, 0);
     }, [currentPage]);
 
-    const handleNextPage = () => {
-        if (currentPage < pagination.totalPages) {
-            setSearchParams({ page: currentPage + 1 });
-        }
-    };
-
-    const handlePrevPage = () => {
-        if (currentPage > 1) {
-            setSearchParams({ page: currentPage - 1 });
-        }
+    const handlePageChange = (newPage) => {
+        setSearchParams({ page: newPage });
     };
 
     return (
         <div>
             <h1 className='home-page-title'>Featured Products</h1>
-            <p className='home-page-description'>Explore our latest products below</p>
+            <p className='home-page-description'>Explore our products below</p>
 
             {loading && <p>Loading products...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {!loading && !error && (
                 <>
                     <ProductList products={products} />
-                    {pagination && pagination.totalPages > 1 && (
-                        <div className="pagination-controls">
-                            <button onClick={handlePrevPage} disabled={currentPage === 1}>
-                                &laquo; Previous
-                            </button>
-                            <span>
-                                Page {pagination.currentPage} of {pagination.totalPages}
-                            </span>
-                            <button onClick={handleNextPage} disabled={currentPage === pagination.totalPages}>
-                                Next &raquo;
-                            </button>
-                        </div>
+                    {/* 3. Replace the old div with the new component */}
+                    {pagination && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={pagination.totalPages}
+                            onPageChange={handlePageChange}
+                        />
                     )}
                 </>
             )}

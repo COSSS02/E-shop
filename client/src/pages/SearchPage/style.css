@@ -13,31 +13,3 @@
 .error-message {
     color: #ff6b6b;
 }
-
-.pagination-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
-
-.pagination-controls button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #88304E;
-    background-color: transparent;
-    color: #f1f1f1;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-    border-radius: 4px;
-}
-
-.pagination-controls button:hover:not(:disabled) {
-    background-color: #88304E;
-    color: white;
-}
-
-.pagination-controls button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}

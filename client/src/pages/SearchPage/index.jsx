@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchProducts } from '../../api/products';
 import ProductList from '../../components/products/ProductList';
+import Pagination from '../../components/pagination/Pagination';
 import './style.css';
 
 function SearchPage() {
@@ -26,6 +27,15 @@ function SearchPage() {
                 setLoading(true);
                 setError(null);
                 const data = await searchProducts(query, currentPage);
+
+                // Validate the page number after fetching
+                const { totalPages } = data.pagination;
+                if (totalPages > 0 && currentPage > totalPages) {
+                    // Preserve the query when redirecting to the last page
+                    setSearchParams({ q: query, page: totalPages });
+                    return;
+                }
+
                 setProducts(data.products);
                 setPagination(data.pagination);
             } catch (err) {
@@ -55,18 +65,12 @@ function SearchPage() {
                         ? <ProductList products={products} />
                         : <p>No products found matching your search.</p>
                     }
-                    {pagination && pagination.totalPages > 1 && (
-                        <div className="pagination-controls">
-                            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                                &laquo; Previous
-                            </button>
-                            <span>
-                                Page {pagination.currentPage} of {pagination.totalPages}
-                            </span>
-                            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === pagination.totalPages}>
-                                Next &raquo;
-                            </button>
-                        </div>
+                    {pagination && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={pagination.totalPages}
+                            onPageChange={handlePageChange}
+                        />
                     )}
                 </>
             )}
