@@ -61,7 +61,10 @@ const productController = {
             const page = parseInt(req.query.page, 10) || 1;
             const offset = (page - 1) * limit;
 
-            const { products, totalProducts } = await Product.search(q, limit, offset);
+            const sort = req.query.sort || 'name-asc';
+            const [sortBy, sortOrder] = sort.split('-');
+
+            const { products, totalProducts } = await Product.search(q, limit, offset, sortBy, sortOrder);
 
             res.status(200).json({
                 products,
@@ -87,6 +90,9 @@ const productController = {
             const page = parseInt(req.query.page, 10) || 1;
             const offset = (page - 1) * limit;
 
+            const sort = req.query.sort || 'name-asc';
+            const [sortBy, sortOrder] = sort.split('-');
+
             // 1. Find the category details (including description)
             const category = await Category.findByName(categoryName);
             if (!category) {
@@ -94,7 +100,7 @@ const productController = {
             }
 
             // 2. Find all products in that category with pagination
-            const { products, totalProducts } = await Product.findByCategoryName(categoryName, limit, offset);
+            const { products, totalProducts } = await Product.findByCategoryName(categoryName, limit, offset, sortBy, sortOrder);
 
             // 3. Send both back to the client with pagination info
             res.status(200).json({
@@ -121,7 +127,10 @@ const productController = {
             const page = parseInt(req.query.page, 10) || 1;
             const offset = (page - 1) * limit;
 
-            const { products, totalProducts } = await Product.findAll(limit, offset);
+            const sort = req.query.sort || 'name-asc'; // e.g., 'price-asc'
+            const [sortBy, sortOrder] = sort.split('-');
+
+            const { products, totalProducts } = await Product.findAll(limit, offset, sortBy, sortOrder);
 
             res.status(200).json({
                 products,

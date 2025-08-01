@@ -107,15 +107,23 @@ const Product = {
     },
 
     /**
-        * Searches for products by name or description with pagination.
+     * Searches for products by name or description with pagination and sorting.
      * @param {string} searchTerm - The term to search for.
      * @param {number} limit - The number of products to return per page.
      * @param {number} offset - The number of products to skip.
+     * @param {string} sortBy - The column to sort by.
+     * @param {string} sortOrder - The sort order ('ASC' or 'DESC').
      * @returns {Promise<object>} An object containing the products array and the total count.
      */
-    async search(searchTerm, limit, offset) {
+    async search(searchTerm, limit, offset, sortBy = 'name', sortOrder = 'ASC') {
         const searchPattern = `%${searchTerm}%`;
         const commonWhereClause = `WHERE p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?`;
+
+        // Whitelist for security
+        const allowedSortBy = ['name', 'price', 'stock_quantity', 'created_at'];
+        const allowedSortOrder = ['ASC', 'DESC'];
+        const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
+        const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
 
         // First, get the total count of matching products
         const countSql = `
@@ -126,7 +134,7 @@ const Product = {
         `;
         const [[{ total }]] = await db.query(countSql, [searchPattern, searchPattern, searchPattern]);
 
-        // Then, get the paginated list of products
+        // Then, get the paginated list of products with dynamic sorting
         const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
@@ -134,7 +142,7 @@ const Product = {
             FROM products p
             JOIN categories c ON p.category_id = c.id
             ${commonWhereClause}
-            ORDER BY p.created_at DESC
+            ORDER BY ${safeSortBy} ${safeSortOrder}
             LIMIT ?
             OFFSET ?
         `;
@@ -144,13 +152,21 @@ const Product = {
     },
 
     /**
-     * Finds all products belonging to a specific category name with pagination.
+     * Finds all products belonging to a specific category name with pagination and sorting.
      * @param {string} categoryName - The name of the category.
      * @param {number} limit - The number of products to return per page.
      * @param {number} offset - The number of products to skip.
+     * @param {string} sortBy - The column to sort by.
+     * @param {string} sortOrder - The sort order ('ASC' or 'DESC').
      * @returns {Promise<object>} An object containing the products array and the total count for that category.
      */
-    async findByCategoryName(categoryName, limit, offset) {
+    async findByCategoryName(categoryName, limit, offset, sortBy = 'name', sortOrder = 'ASC') {
+        // Whitelist for security
+        const allowedSortBy = ['name', 'price', 'stock_quantity', 'created_at'];
+        const allowedSortOrder = ['ASC', 'DESC'];
+        const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
+        const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
+
         // Get total count for the specific category
         const countSql = `
             SELECT COUNT(*) as total
@@ -160,7 +176,7 @@ const Product = {
         `;
         const [[{ total }]] = await db.query(countSql, [categoryName]);
 
-        // Get paginated products for the category
+        // Get paginated products for the category with dynamic sorting
         const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
@@ -168,7 +184,7 @@ const Product = {
             FROM products p
             JOIN categories c ON p.category_id = c.id
             WHERE c.name = ?
-            ORDER BY p.created_at DESC
+            ORDER BY ${safeSortBy} ${safeSortOrder}
             LIMIT ?
             OFFSET ?
         `;
@@ -178,24 +194,34 @@ const Product = {
     },
 
     /**
-    * Finds all products with pagination.
-    * @param {number} limit - The number of products to return per page.
-    * @param {number} offset - The number of products to skip.
-    * @returns {Promise<object>} An object containing the products array and the total count.
-    */
-    async findAll(limit, offset) {
+         * Finds all products with pagination and sorting.
+     * @param {number} limit - The number of products to return per page.
+     * @param {number} offset - The number of products to skip.
+     * @param {string} sortBy - The column to sort by.
+     * @param {string} sortOrder - The sort order ('ASC' or 'DESC').
+     * @returns {Promise<object>} An object containing the products array and the total count.
+     */
+    async findAll(limit, offset, sortBy = 'name', sortOrder = 'ASC') {
+        // Whitelist of allowed columns for sorting to prevent SQL injection
+        const allowedSortBy = ['name', 'price', 'stock_quantity', 'created_at'];
+        const allowedSortOrder = ['ASC', 'DESC'];
+
+        // Validate and sanitize sort parameters, defaulting to 'newest'
+        const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
+        const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
+
         // First, get the total count of all products for pagination metadata
         const countSql = `SELECT COUNT(*) as total FROM products`;
         const [[{ total }]] = await db.query(countSql);
 
-        // Then, get the paginated list of products
+        // Then, get the paginated list of products with dynamic sorting
         const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
                 c.name as category_name
             FROM products p
             JOIN categories c ON p.category_id = c.id
-            ORDER BY p.created_at DESC
+            ORDER BY ${safeSortBy} ${safeSortOrder}
             LIMIT ?
             OFFSET ?
         `;

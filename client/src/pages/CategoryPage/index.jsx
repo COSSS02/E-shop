@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { getProductsByCategory } from '../../api/products';
 import ProductList from '../../components/products/ProductList';
 import Pagination from '../../components/pagination/Pagination';
+import SortControl from '../../components/sortcontrol/SortControl';
 import './style.css';
 
 function CategoryPage() {
@@ -15,17 +16,17 @@ function CategoryPage() {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
+    const currentSort = searchParams.get('sort') || 'name-asc';
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const data = await getProductsByCategory(categoryName, currentPage);
+                const data = await getProductsByCategory(categoryName, currentPage, currentSort);
 
-                // Validate the page number after fetching
                 const { totalPages } = data.pagination;
                 if (totalPages > 0 && currentPage > totalPages) {
-                    setSearchParams({ page: totalPages });
+                    setSearchParams({ sort: currentSort, page: totalPages });
                     return;
                 }
 
@@ -41,16 +42,21 @@ function CategoryPage() {
 
         fetchProducts();
         window.scrollTo(0, 0);
-    }, [categoryName, currentPage]);
+    }, [categoryName, currentPage, currentSort, setSearchParams]);
 
     const handlePageChange = (newPage) => {
-        setSearchParams({ page: newPage });
+        setSearchParams({ sort: currentSort, page: newPage });
+    };
+
+    const handleSortChange = (e) => {
+        setSearchParams({ sort: e.target.value, page: 1 });
     };
 
     return (
         <div className="category-page-container">
             <h1>{categoryName}</h1>
             {category && <p className="category-description">{category.description}</p>}
+            <SortControl currentSort={currentSort} onSortChange={handleSortChange} />
 
             {loading && <p>Loading products...</p>}
             {error && <p className="error-message">{error}</p>}

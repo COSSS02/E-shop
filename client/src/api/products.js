@@ -1,7 +1,7 @@
-export const getAllProducts = async (page = 1) => {
+export const getAllProducts = async (page = 1, sort = 'name-asc') => {
     try {
         // Append the page number to the request URL
-        const response = await fetch(`/api/products?page=${page}`);
+        const response = await fetch(`/api/products?page=${page}&sort=${sort}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -25,9 +25,9 @@ export const getProductById = async (productId) => {
     }
 }
 
-export const getProductsByCategory = async (categoryName, page = 1) => {
+export const getProductsByCategory = async (categoryName, page = 1, sort = 'name-asc') => {
     try {
-        const response = await fetch(`/api/products/category/${encodeURIComponent(categoryName)}?page=${page}`);
+        const response = await fetch(`/api/products/category/${encodeURIComponent(categoryName)}?page=${page}&sort=${sort}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -38,9 +38,9 @@ export const getProductsByCategory = async (categoryName, page = 1) => {
     }
 };
 
-export const searchProducts = async (query, page = 1) => {
+export const searchProducts = async (query, page = 1, sort = 'name-asc') => {
     try {
-        const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&page=${page}`);
+        const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&page=${page}&sort=${sort}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

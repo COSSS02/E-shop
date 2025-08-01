@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { getAllProducts } from '../../api/products';
 import ProductList from '../../components/products/ProductList';
 import Pagination from '../../components/pagination/Pagination';
+import SortControl from '../../components/sortcontrol/SortControl';
 import './style.css';
 
 function HomePage() {
@@ -13,19 +14,18 @@ function HomePage() {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
+    const currentSort = searchParams.get('sort') || 'name-asc';
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const data = await getAllProducts(currentPage);
+                const data = await getAllProducts(currentPage, currentSort);
 
-                // Validate the page number after fetching
                 const { totalPages } = data.pagination;
                 if (totalPages > 0 && currentPage > totalPages) {
-                    // If page is too high, go to the last page
-                    setSearchParams({ page: totalPages });
-                    return; // Stop execution to avoid rendering with invalid data
+                    setSearchParams({ sort: currentSort, page: totalPages });
+                    return;
                 }
 
                 setProducts(data.products);
@@ -38,25 +38,31 @@ function HomePage() {
         };
 
         fetchProducts();
-        // Scroll to top when page changes
         window.scrollTo(0, 0);
-    }, [currentPage]);
+    }, [currentPage, currentSort, setSearchParams]);
 
     const handlePageChange = (newPage) => {
-        setSearchParams({ page: newPage });
+        setSearchParams({ sort: currentSort, page: newPage });
+    };
+
+    const handleSortChange = (e) => {
+        setSearchParams({ sort: e.target.value, page: 1 });
     };
 
     return (
         <div>
-            <h1 className='home-page-title'>Featured Products</h1>
+            <div className="home-header">
+                <h1 className='home-page-title'>Featured Products</h1>
+                {/* Replace the old JSX with the new component */}
+            </div>
             <p className='home-page-description'>Explore our products below</p>
+            <SortControl currentSort={currentSort} onSortChange={handleSortChange} />
 
             {loading && <p>Loading products...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {!loading && !error && (
                 <>
                     <ProductList products={products} />
-                    {/* 3. Replace the old div with the new component */}
                     {pagination && (
                         <Pagination
                             currentPage={currentPage}
