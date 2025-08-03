@@ -6,6 +6,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import CategoryPage from './pages/CategoryPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
+import CartPage from './pages/CartPage';
 import AddCategoryPage from './pages/AddCategoryPage';
 import AddProductPage from './pages/AddProductPage';
 import EditProductPage  from './pages/EditProductPage';
@@ -45,6 +46,11 @@ function App() {
           <Route path="/provider/edit-product/:productId" element={
             <ProtectedRoute roles={['provider']}>
               <EditProductPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/cart" element={
+            <ProtectedRoute> {/* Protected for all logged-in users */}
+              <CartPage />
             </ProtectedRoute>
           } />
         </Routes>

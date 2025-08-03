@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getProductById } from '../../api/products';
+import { addToCart } from '../../api/cart';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
 import './style.css';
 
 function ProductDetailPage() {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const { productId } = useParams();
+    const { refreshCart } = useCart();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -39,6 +42,38 @@ function ProductDetailPage() {
         return null; // Or a "Product not found" component
     }
 
+    const handleAddToCart = async () => {
+        console.log("1. 'Add to Cart' button clicked.");
+
+        if (!token) {
+            console.log("2. No token found. User is not logged in.");
+            alert("Please log in to add items to your cart.");
+            return;
+        }
+
+        if (!product || !product.id) {
+            console.error("2. Product data is not available.");
+            alert("Error: Product information is missing. Cannot add to cart.");
+            return;
+        }
+
+        console.log(`2. Preparing to add product ID: ${product.id} to cart.`);
+
+        try {
+            console.log("3. Calling the addToCart API function...");
+            await addToCart(product.id, 1, token);
+            console.log("4. API call successful.");
+
+            await refreshCart();
+            console.log("5. Cart refreshed.");
+
+            alert(`${product.name} has been added to your cart!`);
+        } catch (error) {
+            console.error("ERROR during 'Add to Cart' process:", error);
+            alert(`An error occurred: ${error.message}`);
+        }
+    };
+
     return (
         <div className="product-detail-container">
             <div className="product-detail-card">
@@ -64,6 +99,7 @@ function ProductDetailPage() {
                         <button
                             className="add-to-cart-btn"
                             disabled={product.stock_quantity === 0}
+                            onClick={handleAddToCart}
                         >
                             Add to Cart
                         </button>
