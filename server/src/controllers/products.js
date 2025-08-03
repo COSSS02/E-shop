@@ -29,6 +29,34 @@ const productController = {
     },
 
     /**
+     * Handles updating an existing product.
+     */
+    async updateProduct(req, res) {
+        try {
+            const { id } = req.params;
+            const userId = req.user.id;
+            const { productData, attributesData } = req.body;
+
+            if (!productData || !attributesData) {
+                return res.status(400).json({ message: "Missing productData or attributesData." });
+            }
+
+            await Product.update(Number(id), userId, productData, attributesData);
+            res.status(200).json({ message: "Product updated successfully", productId: id });
+
+        } catch (error) {
+            // Handle specific errors from the model
+            if (error.message.includes("authorized")) {
+                return res.status(403).json({ message: error.message });
+            }
+            if (error.message.includes("not found")) {
+                return res.status(404).json({ message: error.message });
+            }
+            res.status(500).json({ message: "Error updating product", error: error.message });
+        }
+    },
+
+    /**
      * Handles retrieving a single product by its ID.
      */
     async getProductById(req, res) {

@@ -19,4 +19,7 @@ router.get('/category/:categoryName', productController.getProductsByCategory);
 // GET /api/products/:id - Get a single product by its ID
 router.get('/:id', productController.getProductById);
 
+// PUT /api/products/:id - Update a product by its ID
+router.put('/:id', authMiddleware, productController.updateProduct);
+
 module.exports = router;

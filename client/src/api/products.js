@@ -72,3 +72,24 @@ export const createProduct = async (productPayload, token) => {
         throw error;
     }
 };
+
+export const updateProduct = async (productId, productPayload, token) => {
+    try {
+        const response = await fetch(`/api/products/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(productPayload)
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to update product.');
+        }
+        return data;
+    } catch (error) {
+        console.error("Failed to update product:", error);
+        throw error;
+    }
+};

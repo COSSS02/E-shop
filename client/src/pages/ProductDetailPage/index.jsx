@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { getProductById } from '../../api/products';
+import { useAuth } from '../../contexts/AuthContext';
 import './style.css';
 
 function ProductDetailPage() {
+    const { user } = useAuth();
     const { productId } = useParams();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -65,6 +67,11 @@ function ProductDetailPage() {
                         >
                             Add to Cart
                         </button>
+                        {user && user.id === product.provider_id && (
+                            <Link to={`/provider/edit-product/${product.id}`} className="edit-product-btn">
+                                Edit Product
+                            </Link>
+                        )}
                     </div>
                 </div>
 

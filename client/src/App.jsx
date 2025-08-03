@@ -8,6 +8,7 @@ import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 import AddCategoryPage from './pages/AddCategoryPage';
 import AddProductPage from './pages/AddProductPage';
+import EditProductPage  from './pages/EditProductPage';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './App.css'
@@ -39,6 +40,11 @@ function App() {
           <Route path="/provider/add-product" element={
             <ProtectedRoute roles={['provider']}>
               <AddProductPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/provider/edit-product/:productId" element={
+            <ProtectedRoute roles={['provider']}>
+              <EditProductPage />
             </ProtectedRoute>
           } />
         </Routes>

@@ -72,6 +72,61 @@ const Product = {
     },
 
     /**
+     * Updates an existing product and its attributes.
+     * @param {number} productId - The ID of the product to update.
+     * @param {number} userId - The ID of the user attempting the update (for authorization).
+     * @param {object} productData - The core product data to update.
+     * @param {Array<object>} attributesData - The new set of attributes for the product.
+     * @returns {Promise<boolean>} True on success.
+     */
+    async update(productId, userId, productData, attributesData) {
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            // Security Check: Verify the user owns the product before updating.
+            const [productRows] = await connection.query('SELECT provider_id FROM products WHERE id = ?', [productId]);
+            if (productRows.length === 0) throw new Error("Product not found.");
+            if (productRows[0].provider_id !== userId) throw new Error("User not authorized to edit this product.");
+
+            // 1. Update the core product details
+            await connection.query('UPDATE products SET ? WHERE id = ?', [productData, productId]);
+
+            // 2. Delete all old attributes for this product
+            await connection.query('DELETE FROM product_attributes WHERE product_id = ?', [productId]);
+
+            // 3. Re-insert the new/updated attributes (similar to the create method)
+            for (const attr of attributesData) {
+                if (!attr.attributeName || !attr.value) continue;
+
+                const capitalizedAttrName = attr.attributeName.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+                let [rows] = await connection.query('SELECT id FROM attributes WHERE name = ? AND category_id = ?', [capitalizedAttrName, productData.category_id]);
+                let attributeId;
+
+                if (rows.length > 0) {
+                    attributeId = rows[0].id;
+                } else {
+                    const [newAttrResult] = await connection.query('INSERT INTO attributes (name, category_id) VALUES (?, ?)', [productData.category_id, capitalizedAttrName]);
+                    attributeId = newAttrResult.insertId;
+                }
+
+                await connection.query('INSERT INTO product_attributes (product_id, attribute_id, value) VALUES (?, ?, ?)', [productId, attributeId, attr.value]);
+            }
+
+            await connection.commit();
+            return true;
+
+        } catch (error) {
+            await connection.rollback();
+            console.error("Error updating product:", error);
+            throw error;
+        } finally {
+            connection.release();
+        }
+    },
+
+    /**
      * Finds a single product by its ID and retrieves all its attributes.
      * @param {number} productId - The ID of the product.
      * @returns {Promise<object|null>} The product object with an 'attributes' array, or null.
