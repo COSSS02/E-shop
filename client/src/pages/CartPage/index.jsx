@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { getCart, updateCartItem, removeFromCart, placeOrder } from '../../api/cart';
 import { getMyAddresses } from '../../api/address';
+import QuantitySelector from '../../components/quantityselector/QuantitySelector';
 import { Link, useNavigate } from 'react-router-dom';
 import './style.css';
 
@@ -95,43 +96,41 @@ function CartPage() {
                             <div key={item.product_id} className="cart-item">
                                 <div className="cart-item-info">
                                     <Link to={`/products/${item.product_id}`}><h4>{item.name}</h4></Link>
-                                    <p>Price: ${item.price}</p>
+                                    <p>Price: <strong>${item.price}</strong></p>
                                 </div>
                                 <div className="cart-item-actions">
-                                    <input
-                                        type="number"
-                                        value={item.quantity}
-                                        onChange={(e) => handleUpdateQuantity(item.product_id, parseInt(e.target.value, 10))}
-                                        min="1"
-                                        max={item.stock_quantity}
+                                    <QuantitySelector
+                                        initialQuantity={item.quantity}
+                                        maxQuantity={item.stock_quantity}
+                                        onQuantityChange={(newQuantity) => handleUpdateQuantity(item.product_id, newQuantity)}
                                     />
-                                    <button onClick={() => handleRemoveItem(item.product_id)}>Remove</button>
+                                    <button className='remove-button' onClick={() => handleRemoveItem(item.product_id)}>Remove</button>
                                 </div>
                             </div>
                         ))}
                     </div>
                     <div className="cart-summary">
-                        <h3>Order Summary</h3>
+                        <h2>Order Summary</h2>
                         <p>Total: <strong>${total.toFixed(2)}</strong></p>
                         <div className="address-selection">
+                            <Link to="/profile">Manage Addresses</Link>
                             <h4>Shipping Address</h4>
                             <select value={shippingAddressId} onChange={e => setShippingAddressId(e.target.value)} required>
                                 <option value="">Select Shipping Address</option>
                                 {shippingAddresses.map(addr => <option key={addr.id} value={addr.id}>{addr.street}, {addr.city}</option>)}
                             </select>
-                            <Link to="/profile">Manage Addresses</Link>
 
                             <h4>Billing Address</h4>
-                            <label>
-                                <input type="checkbox" checked={useShippingForBilling} onChange={e => setUseShippingForBilling(e.target.checked)} />
-                                Use shipping address for billing
-                            </label>
                             {!useShippingForBilling && (
                                 <select value={billingAddressId} onChange={e => setBillingAddressId(e.target.value)} required>
                                     <option value="">Select Billing Address</option>
                                     {billingAddresses.map(addr => <option key={addr.id} value={addr.id}>{addr.street}, {addr.city}</option>)}
                                 </select>
                             )}
+                            <label>
+                                <input type="checkbox" checked={useShippingForBilling} onChange={e => setUseShippingForBilling(e.target.checked)} />
+                                Use shipping address for billing
+                            </label>
                         </div>
                         <button className="checkout-btn" onClick={handlePlaceOrder}>Place Order</button>
                     </div>
