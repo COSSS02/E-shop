@@ -213,37 +213,55 @@ const Product = {
      * @param {number} offset - The number of products to skip.
      * @param {string} sortBy - The column to sort by.
      * @param {string} sortOrder - The sort order ('ASC' or 'DESC').
+     * @param {object} filters - An object of filters, e.g., { Color: 'Red', Size: 'M' }.
      * @returns {Promise<object>} An object containing the products array and the total count for that category.
      */
-    async findByCategoryName(categoryName, limit, offset, sortBy = 'name', sortOrder = 'ASC') {
+    async findByCategoryName(categoryName, limit, offset, sortBy = 'name', sortOrder = 'ASC', filters = {}) {
         // Whitelist for security
         const allowedSortBy = ['name', 'price', 'stock_quantity', 'created_at'];
-        const allowedSortOrder = ['ASC', 'DESC'];
+        const allowedSortOrder = ['ASC', 'DESC'];   
         const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
         const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
 
-        // Get total count for the specific category
-        const countSql = `
-            SELECT COUNT(*) as total
+        let filterClauses = '';
+        let filterValues = [];
+        const filterKeys = Object.keys(filters);
+
+        if (filterKeys.length > 0) {
+            const subquery = `
+                SELECT pa.product_id
+                FROM product_attributes pa
+                JOIN attributes a ON pa.attribute_id = a.id
+                WHERE (a.name, pa.value) IN (?)
+                GROUP BY pa.product_id
+                HAVING COUNT(DISTINCT a.name) = ?
+            `;
+            const filterPairs = filterKeys.map(key => [key, filters[key]]);
+            filterClauses = `AND p.id IN (${subquery})`;
+            filterValues.push(filterPairs, filterKeys.length);
+        }
+
+        const baseQuery = `
             FROM products p
             JOIN categories c ON p.category_id = c.id
-            WHERE c.name = ?
+            WHERE c.name = ? ${filterClauses}
         `;
-        const [[{ total }]] = await db.query(countSql, [categoryName]);
 
-        // Get paginated products for the category with dynamic sorting
+        // Get total count for the specific category with filters
+        const countSql = `SELECT COUNT(*) as total ${baseQuery}`;
+        const [[{ total }]] = await db.query(countSql, [categoryName, ...filterValues]);
+
+        // Get paginated products for the category with dynamic sorting and filters
         const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
                 c.name as category_name
-            FROM products p
-            JOIN categories c ON p.category_id = c.id
-            WHERE c.name = ?
+            ${baseQuery}
             ORDER BY ${safeSortBy} ${safeSortOrder}
             LIMIT ?
             OFFSET ?
         `;
-        const [products] = await db.query(productsSql, [categoryName, limit, offset]);
+        const [products] = await db.query(productsSql, [categoryName, ...filterValues, limit, offset]);
 
         return { products, totalProducts: total };
     },

@@ -13,6 +13,46 @@
     margin: -1rem auto 2rem auto;
 }
 
+.filter-sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content:space-evenly;
+    gap: 2.5rem;
+    background-color: #3a3a3a;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 2rem;
+}
+
+.filter-sidebar h3 {
+    margin: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+    color: #e67e22;
+}
+
+.filter-group {
+    margin-bottom: 0;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #dcdcdc;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #555;
+    background-color: #2c2c2c;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 .error-message {
     color: #ff6b6b;
 }

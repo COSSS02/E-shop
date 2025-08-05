@@ -12,6 +12,19 @@ const attributeController = {
         } catch (error) {
             res.status(500).json({ message: "Error retrieving attributes", error: error.message });
         }
+    },
+
+    /**
+     * Handles retrieving filterable attributes for a category page.
+     */
+    async getCategoryFilters(req, res) {
+        try {
+            const { categoryName } = req.params;
+            const filters = await Attribute.getFiltersForCategory(categoryName);
+            res.status(200).json(filters);
+        } catch (error) {
+            res.status(500).json({ message: "Error retrieving filters", error: error.message });
+        }
     }
 };
 

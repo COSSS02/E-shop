@@ -25,9 +25,14 @@ export const getProductById = async (productId) => {
     }
 }
 
-export const getProductsByCategory = async (categoryName, page = 1, sort = 'name-asc') => {
+export const getProductsByCategory = async (categoryName, page = 1, sort = 'name-asc', filters={}) => {
     try {
-        const response = await fetch(`/api/products/category/${encodeURIComponent(categoryName)}?page=${page}&sort=${sort}`);
+        const params = new URLSearchParams({
+            page,
+            sort,
+            ...filters
+        });
+        const response = await fetch(`/api/products/category/${encodeURIComponent(categoryName)}?${params.toString()}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

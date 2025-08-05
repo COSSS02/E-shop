@@ -121,6 +121,11 @@ const productController = {
             const sort = req.query.sort || 'name-asc';
             const [sortBy, sortOrder] = sort.split('-');
 
+            const filters = { ...req.query };
+            delete filters.limit;
+            delete filters.page;
+            delete filters.sort;
+
             // 1. Find the category details (including description)
             const category = await Category.findByName(categoryName);
             if (!category) {
@@ -128,7 +133,7 @@ const productController = {
             }
 
             // 2. Find all products in that category with pagination
-            const { products, totalProducts } = await Product.findByCategoryName(categoryName, limit, offset, sortBy, sortOrder);
+            const { products, totalProducts } = await Product.findByCategoryName(categoryName, limit, offset, sortBy, sortOrder, filters);
 
             // 3. Send both back to the client with pagination info
             res.status(200).json({
