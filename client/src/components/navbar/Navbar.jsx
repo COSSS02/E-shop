@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
 import Logo from '../../assets/logo.svg';
 import Hamburger from '../hamburger/Hamburger';
 import SideMenu from '../sidemenu/SideMenu';
@@ -10,6 +11,7 @@ function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const { user, logout } = useAuth();
+    const { cartItemCount } = useCart();
     const navigate = useNavigate();
 
     const toggleMenu = () => {
@@ -50,7 +52,9 @@ function Navbar() {
                     {user ? (
                         <>
                             <Link to="/profile" className="nav-button">Profile</Link>
-                            <Link to="/cart" className="nav-button">Cart</Link>
+                            <Link to="/cart" className="nav-cart-link nav-button">Cart
+                                {cartItemCount > 0 && <span className="cart-badge">{cartItemCount}</span>}
+                            </Link>
                             <button onClick={logout} className="nav-button logout-button">Logout</button>
                         </>
                     ) : (

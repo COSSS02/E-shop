@@ -68,7 +68,7 @@ function ProductDetailPage() {
 
             await refreshCart();
 
-            alert(`${product.name} has been added to your cart!`);
+            // alert(`${product.name} has been added to your cart!`);
         } catch (error) {
             console.error("ERROR during 'Add to Cart' process:", error);
             alert(`An error occurred: ${error.message}`);
