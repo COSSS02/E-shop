@@ -42,6 +42,14 @@ function ProductDetailPage() {
         return null; // Or a "Product not found" component
     }
 
+    const getImageUrl = (categoryName) => {
+        if (!categoryName) {
+            return '';
+        }
+        const imageName = categoryName.toLowerCase().replace(/ /g, '_') + '.png';
+        return `/images/${imageName}`;
+    };
+
     const handleAddToCart = async () => {
 
         if (!token) {
@@ -81,6 +89,7 @@ function ProductDetailPage() {
                     </div>
                     <span className="product-category">{product.category_name}</span>
                 </div>
+                <img src={getImageUrl(product.category_name)} alt={product.name} className="product-detail-image" />
                 <p className="product-description">{product.description}</p>
 
                 <div className="product-purchase-section">
