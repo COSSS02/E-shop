@@ -9,11 +9,13 @@ const attributeRoutes = require('./src/routes/attribute');
 const cartRoutes = require('./src/routes/cart');
 const orderRoutes = require('./src/routes/orders');
 
-
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/address', addressRoutes);
@@ -22,8 +24,6 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/attributes', attributeRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
-
-app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.get("/*splat", (req, res) => {
     console.log("Request received for:", req.url);

@@ -23,6 +23,11 @@ export default defineConfig({
         //     console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
         //   });
         // }
+      },
+      '/images': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
       }
     }
   }
