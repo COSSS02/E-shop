@@ -56,6 +56,7 @@
     font-size: 1rem;
     color: #2C2C2C;
     background-color: rgb(255, 63, 98);
+
 }
 
 .search-input:focus {
@@ -68,6 +69,7 @@
     padding: 0.5rem 1rem;
     border: 1px solid #522546;
     background-color: #522546;
+    transition: background-color 0.2s, border-color 0.2s;
     color: rgb(220, 220, 220);
     border-radius: 0 4px 4px 0;
     /* Rounded corners on the right side */
