@@ -1,29 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMyAddresses, createAddress } from '../../api/address';
+import { getMyOrders } from '../../api/cart';
 import { upgradeToProvider } from '../../api/auth';
+import OrderHistory from '../../components/orderhistory/OrderHistory';
 import './style.css';
 
 function ProfilePage() {
     const { user, token, logout } = useAuth();
     const [addresses, setAddresses] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [showProviderForm, setShowProviderForm] = useState(false);
     const [error, setError] = useState('');
     const [showShippingAddressForm, setShowShippingAddressForm] = useState(false);
     const [showBillingAddressForm, setShowBillingAddressForm] = useState(false);
 
-    const fetchAddresses = async () => {
-        try {
-            const data = await getMyAddresses(token);
-            setAddresses(data);
-        } catch (err) {
-            setError('Could not load addresses.');
-        }
-    };
-
     useEffect(() => {
+        const fetchAllData = async () => {
+            try {
+                const [addressData, orderData] = await Promise.all([
+                    getMyAddresses(token),
+                    getMyOrders(token)
+                ]);
+                setAddresses(addressData);
+                setOrders(orderData);
+            } catch (err) {
+                setError('Could not load your profile data.');
+            }
+        };
+
         if (token) {
-            fetchAddresses();
+            fetchAllData();
         }
     }, [token]);
 
@@ -95,6 +102,11 @@ function ProfilePage() {
                 ) : <p>No billing addresses found.</p>}
                 <button onClick={() => setShowBillingAddressForm(!showBillingAddressForm)}>Add New Address</button>
                 {showBillingAddressForm && <AddressForm onSubmit={(data) => handleAddressSubmit({ ...data, addressType: 'billing' })} />}
+            </div>
+
+            <div className="profile-card">
+                <h3>Order History</h3>
+                {orders.length > 0 ? <OrderHistory orders={orders} /> : <p>You have not placed any orders yet.</p>}
             </div>
 
             {user.role === 'client' && (

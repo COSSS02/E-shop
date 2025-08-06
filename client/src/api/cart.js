@@ -56,3 +56,10 @@ export const placeOrder = async (addressIds, token) => {
     });
     return handleResponse(response);
 };
+
+export const getMyOrders = async (token) => {
+    const response = await fetch('/api/orders/my-orders', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return handleResponse(response);
+};

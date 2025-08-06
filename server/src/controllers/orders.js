@@ -12,6 +12,16 @@ const orderController = {
         } catch (error) {
             res.status(500).json({ message: error.message || "Error creating order" });
         }
+    },
+
+    async getUserOrders(req, res) {
+        try {
+            const userId = req.user.id;
+            const orders = await Order.findByUserId(userId);
+            res.status(200).json(orders);
+        } catch (error) {
+            res.status(500).json({ message: "Error retrieving orders", error: error.message });
+        }
     }
 };
 

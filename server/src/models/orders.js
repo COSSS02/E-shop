@@ -48,6 +48,52 @@ const Order = {
         } finally {
             connection.release();
         }
+    },
+
+    /**
+     * Finds all orders for a specific user, including their items.
+     * @param {number} userId - The ID of the user.
+     * @returns {Promise<Array>} An array of order objects, each with an 'items' array.
+     */
+    async findByUserId(userId) {
+        // Get all base orders for the user
+        const ordersSql = `
+            SELECT id, total_amount, order_status, created_at
+            FROM orders
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+        `;
+        const [orders] = await db.query(ordersSql, [userId]);
+
+        if (orders.length === 0) {
+            return [];
+        }
+
+        const orderIds = orders.map(o => o.id);
+
+        // Get all items for all of those orders in one go
+        const itemsSql = `
+            SELECT
+                oi.order_id,
+                oi.product_id,
+                oi.quantity,
+                oi.price_at_purchase,
+                p.name AS product_name
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id IN (?)
+        `;
+        const [items] = await db.query(itemsSql, [orderIds]);
+
+        // Map items to their respective orders for an efficient join
+        const ordersMap = new Map(orders.map(o => [o.id, { ...o, items: [] }]));
+        for (const item of items) {
+            if (ordersMap.has(item.order_id)) {
+                ordersMap.get(item.order_id).items.push(item);
+            }
+        }
+
+        return Array.from(ordersMap.values());
     }
 };
 
