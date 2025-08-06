@@ -10,6 +10,9 @@ router.post('/', authMiddleware, checkRole(['provider']), productController.crea
 
 router.get('/', productController.getAllProducts);
 
+// GET /api/products/my-products - Get all products for the logged-in provider
+router.get('/my-products', authMiddleware, checkRole(['provider']), productController.getProviderProducts);
+
 // GET /api/products/search?q=... - Search for products
 router.get('/search', productController.searchProducts);
 

@@ -152,6 +152,34 @@ const productController = {
         }
     },
 
+    /**
+     * Handles retrieving all products for the logged-in provider.
+     */
+    async getProviderProducts(req, res) {
+        try {
+            const providerId = req.user.id; // Get provider ID from authenticated user
+            const limit = parseInt(req.query.limit, 10) || 12;
+            const page = parseInt(req.query.page, 10) || 1;
+            const offset = (page - 1) * limit;
+            const sort = req.query.sort || 'name-asc';
+            const [sortBy, sortOrder] = sort.split('-');
+
+            const { products, totalProducts } = await Product.findByProviderId(providerId, limit, offset, sortBy, sortOrder);
+
+            res.status(200).json({
+                products,
+                pagination: {
+                    currentPage: page,
+                    totalPages: Math.ceil(totalProducts / limit),
+                    totalProducts,
+                    limit
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ message: "Error retrieving provider products", error: error.message });
+        }
+    },
+
     async getAllProducts(req, res) {
         try {
             // Set default limit to 20, can be overridden by query param

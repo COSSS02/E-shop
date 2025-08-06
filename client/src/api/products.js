@@ -43,6 +43,23 @@ export const getProductsByCategory = async (categoryName, page = 1, sort = 'name
     }
 };
 
+export const getProviderProducts = async (token, page = 1, sort = 'name-asc') => {
+    try {
+        const response = await fetch(`/api/products/my-products?page=${page}&sort=${sort}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Failed to fetch provider products:", error);
+        throw error;
+    }
+};
+
 export const searchProducts = async (query, page = 1, sort = 'name-asc') => {
     try {
         const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&page=${page}&sort=${sort}`);

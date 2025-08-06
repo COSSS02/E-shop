@@ -162,6 +162,43 @@ const Product = {
     },
 
     /**
+     * Finds all products for a specific provider with pagination and sorting.
+     * @param {number} providerId - The ID of the provider.
+     * @param {number} limit - The number of products to return per page.
+     * @param {number} offset - The number of products to skip.
+     * @param {string} sortBy - The column to sort by.
+     * @param {string} sortOrder - The sort order ('ASC' or 'DESC').
+     * @returns {Promise<object>} An object containing the products array and the total count.
+     */
+    async findByProviderId(providerId, limit, offset, sortBy = 'name', sortOrder = 'ASC') {
+        // Whitelist for security
+        const allowedSortBy = ['name', 'price', 'stock_quantity', 'created_at'];
+        const allowedSortOrder = ['ASC', 'DESC'];
+        const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
+        const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
+
+        // Get total count for the provider
+        const countSql = `SELECT COUNT(*) as total FROM products WHERE provider_id = ?`;
+        const [[{ total }]] = await db.query(countSql, [providerId]);
+
+        // Get paginated products for the provider
+        const productsSql = `
+            SELECT
+                p.id, p.name, p.description, p.price, p.stock_quantity,
+                c.name as category_name
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            WHERE p.provider_id = ?
+            ORDER BY ${safeSortBy} ${safeSortOrder}
+            LIMIT ?
+            OFFSET ?
+        `;
+        const [products] = await db.query(productsSql, [providerId, limit, offset]);
+
+        return { products, totalProducts: total };
+    },
+
+    /**
      * Searches for products by name or description with pagination and sorting.
      * @param {string} searchTerm - The term to search for.
      * @param {number} limit - The number of products to return per page.
@@ -219,7 +256,7 @@ const Product = {
     async findByCategoryName(categoryName, limit, offset, sortBy = 'name', sortOrder = 'ASC', filters = {}) {
         // Whitelist for security
         const allowedSortBy = ['name', 'price', 'stock_quantity', 'created_at'];
-        const allowedSortOrder = ['ASC', 'DESC'];   
+        const allowedSortOrder = ['ASC', 'DESC'];
         const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
         const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
 

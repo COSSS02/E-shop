@@ -47,6 +47,13 @@ function SideMenu({ isOpen, closeMenu }) {
                             </Link>
                         </>
                     )}
+                    {user && user.role === 'provider' && (
+                        <>
+                            <Link to="/provider/my-products" onClick={handleLinkClick} className="admin-link">
+                                My Products
+                            </Link>
+                        </>
+                    )}
                     <hr className="divider" />
                     {categories.map(category => (
                         <Link

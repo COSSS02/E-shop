@@ -1,8 +1,9 @@
 .sort-controls {
     display: flex;
     align-items: center;
+    justify-content: end;
     gap: 0.5rem;
-    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
 .sort-controls label {
