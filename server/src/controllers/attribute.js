@@ -20,7 +20,8 @@ const attributeController = {
     async getCategoryFilters(req, res) {
         try {
             const { categoryName } = req.params;
-            const filters = await Attribute.getFiltersForCategory(categoryName);
+            const activeFilters = req.body.filters || {};
+            const filters = await Attribute.getFiltersForCategory(categoryName, activeFilters);
             res.status(200).json(filters);
         } catch (error) {
             res.status(500).json({ message: "Error retrieving filters", error: error.message });

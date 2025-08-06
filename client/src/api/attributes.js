@@ -1,6 +1,12 @@
-export const getCategoryFilters = async (categoryName) => {
+export const getCategoryFilters = async (categoryName, filters = {}) => {
     try {
-        const response = await fetch(`/api/attributes/filters/category/${encodeURIComponent(categoryName)}`);
+        const response = await fetch(`/api/attributes/filters/category/${encodeURIComponent(categoryName)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ filters }),
+        });
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

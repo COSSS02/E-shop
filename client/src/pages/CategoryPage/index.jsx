@@ -20,7 +20,7 @@ function CategoryPage() {
 
     const { currentPage, currentSort, activeFilters } = useMemo(() => {
         const page = parseInt(searchParams.get('page') || '1', 10);
-        const sort = searchParams.get('sort') || 'created_at-desc';
+        const sort = searchParams.get('sort') || 'name-asc';
         const filters = {};
         for (const [key, value] of searchParams.entries()) {
             if (key !== 'page' && key !== 'sort') {
@@ -37,7 +37,7 @@ function CategoryPage() {
                 // Fetch products and filters in parallel
                 const [productData, filterData] = await Promise.all([
                     getProductsByCategory(categoryName, currentPage, currentSort, activeFilters),
-                    getCategoryFilters(categoryName)
+                    getCategoryFilters(categoryName, activeFilters)
                 ]);
 
                 const { totalPages } = productData.pagination;

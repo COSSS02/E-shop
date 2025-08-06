@@ -6,6 +6,6 @@ const authMiddleware = require('../middleware/auth');
 // This route is protected to ensure only logged-in users can see attribute suggestions.
 router.get('/category/:categoryId', authMiddleware, attributeController.getAttributesByCategory);
 
-router.get('/filters/category/:categoryName', attributeController.getCategoryFilters);
+router.post('/filters/category/:categoryName', attributeController.getCategoryFilters);
 
 module.exports = router;
