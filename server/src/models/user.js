@@ -58,6 +58,54 @@ const User = {
         const sql = `UPDATE users SET role = ?, company_name = ? WHERE id = ?`;
         const [result] = await db.query(sql, [role, companyName, userId]);
         return result;
+    },
+
+    /**
+     * Changes a user's password after verifying their current one.
+     * @param {number} userId - The ID of the user.
+     * @param {string} currentPassword - The user's current password.
+     * @param {string} newPassword - The new password to set.
+     * @returns {Promise<boolean>} True if the password was changed successfully.
+     */
+    async changePassword(userId, currentPassword, newPassword) {
+        const [rows] = await db.query('SELECT password_hash FROM users WHERE id = ?', [userId]);
+        if (rows.length === 0) {
+            throw new Error("User not found.");
+        }
+        const user = rows[0];
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+        if (!isMatch) {
+            throw new Error("Incorrect current password.");
+        }
+
+        const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+        const updateSql = 'UPDATE users SET password_hash = ? WHERE id = ?';
+        await db.query(updateSql, [newPasswordHash, userId]);
+        return true;
+    },
+
+    /**
+     * Deletes a user's account after verifying their password.
+     * @param {number} userId - The ID of the user to delete.
+     * @param {string} password - The user's password for confirmation.
+     * @returns {Promise<boolean>} True if the account was deleted successfully.
+     */
+    async delete(userId, password) {
+        const [rows] = await db.query('SELECT password_hash FROM users WHERE id = ?', [userId]);
+        if (rows.length === 0) {
+            throw new Error("User not found.");
+        }
+        const user = rows[0];
+
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) {
+            throw new Error("Incorrect password. Account deletion failed.");
+        }
+
+        // Assumes ON DELETE CASCADE is set for related tables (orders, addresses, etc.)
+        await db.query('DELETE FROM users WHERE id = ?', [userId]);
+        return true;
     }
 };
 

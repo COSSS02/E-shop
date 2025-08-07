@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const db = require('./src/config/db');
 const authRoutes = require('./src/routes/auth');
+const userRoutes = require('./src/routes/user');
 const addressRoutes = require('./src/routes/address');
 const productRoutes = require('./src/routes/products');
 const categoryRoutes = require('./src/routes/category');
@@ -19,6 +20,7 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/address', addressRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
