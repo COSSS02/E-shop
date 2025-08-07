@@ -58,7 +58,7 @@ const Order = {
     async findByUserId(userId) {
         // Get all base orders for the user
         const ordersSql = `
-            SELECT id, total_amount, order_status, created_at
+            SELECT id, total_amount, created_at
             FROM orders
             WHERE user_id = ?
             ORDER BY created_at DESC
@@ -78,6 +78,7 @@ const Order = {
                 oi.product_id,
                 oi.quantity,
                 oi.price_at_purchase,
+                oi.status,
                 p.name AS product_name
             FROM order_items oi
             JOIN products p ON oi.product_id = p.id
@@ -94,6 +95,64 @@ const Order = {
         }
 
         return Array.from(ordersMap.values());
+    },
+
+    /**
+     * Finds all order items for a specific provider.
+     * @param {number} providerId - The ID of the provider.
+     * @returns {Promise<Array>} A list of order items with product and customer details.
+     */
+    async findItemsByProviderId(providerId) {
+        const sql = `
+            SELECT
+                oi.id AS order_item_id,
+                oi.order_id,
+                oi.quantity,
+                oi.price_at_purchase,
+                oi.status,
+                p.id AS product_id,
+                p.name AS product_name,
+                o.created_at,
+                u.first_name,
+                u.last_name,
+                sa.street AS shipping_street,
+                sa.city AS shipping_city,
+                sa.state AS shipping_state,
+                sa.zip_code AS shipping_postal_code,
+                sa.country AS shipping_country
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            JOIN orders o ON oi.order_id = o.id
+            LEFT JOIN users u ON o.user_id = u.id
+            LEFT JOIN addresses sa ON o.shipping_address_id = sa.id
+            WHERE p.provider_id = ?
+            ORDER BY o.created_at DESC;
+        `;
+        const [items] = await db.query(sql, [providerId]);
+        return items;
+    },
+
+    /**
+     * Updates the status of a single order item, ensuring the provider has ownership.
+     * @param {number} orderItemId - The ID of the order_items record.
+     * @param {number} providerId - The ID of the provider making the request.
+     * @param {string} newStatus - The new status to set.
+     * @returns {Promise<boolean>} True if the update was successful.
+     */
+    async updateItemStatus(orderItemId, providerId, newStatus) {
+        const sql = `
+            UPDATE order_items oi
+            JOIN products p ON oi.product_id = p.id
+            SET oi.status = ?
+            WHERE oi.id = ? AND p.provider_id = ?;
+        `;
+        const [result] = await db.query(sql, [newStatus, orderItemId, providerId]);
+
+        if (result.affectedRows === 0) {
+            // This means the item was not found OR the provider was not authorized.
+            throw new Error("Order item not found or you are not authorized to update it.");
+        }
+        return true;
     }
 };
 

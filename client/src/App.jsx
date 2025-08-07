@@ -11,6 +11,7 @@ import AddCategoryPage from './pages/AddCategoryPage';
 import AddProductPage from './pages/AddProductPage';
 import EditProductPage from './pages/EditProductPage';
 import MyProductsPage from './pages/MyProductsPage';
+import ManageOrdersPage from './pages/ManageOrdersPage';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './App.css'
@@ -52,6 +53,11 @@ function App() {
           <Route path="/provider/my-products" element={
             <ProtectedRoute roles={['provider']}>
               <MyProductsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/provider/manage-orders" element={
+            <ProtectedRoute roles={['provider']}>
+              <ManageOrdersPage />
             </ProtectedRoute>
           } />
           <Route path="/cart" element={

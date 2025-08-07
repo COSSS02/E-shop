@@ -63,3 +63,22 @@ export const getMyOrders = async (token) => {
     });
     return handleResponse(response);
 };
+
+export const getProviderOrderItems = async (token) => {
+    const response = await fetch('/api/orders/provider', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return handleResponse(response);
+};
+
+export const updateOrderItemStatus = async (itemId, status, token) => {
+    const response = await fetch(`/api/orders/items/${itemId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status })
+    });
+    return handleResponse(response);
+};
