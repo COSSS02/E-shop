@@ -4,6 +4,7 @@ import { getMyAddresses, createAddress } from '../../api/address';
 import { getMyOrders } from '../../api/cart';
 import { upgradeToProvider } from '../../api/auth';
 import OrderHistory from '../../components/orderhistory/OrderHistory';
+import { useToast } from '../../contexts/ToastContext';
 import './style.css';
 
 function ProfilePage() {
@@ -14,6 +15,7 @@ function ProfilePage() {
     const [error, setError] = useState('');
     const [showShippingAddressForm, setShowShippingAddressForm] = useState(false);
     const [showBillingAddressForm, setShowBillingAddressForm] = useState(false);
+    const { addToast } = useToast();
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -52,7 +54,7 @@ function ProfilePage() {
     const handleProviderSubmit = async (providerData) => {
         try {
             const result = await upgradeToProvider(providerData, token);
-            alert(result.message); // Show success message
+            addToast(result.message); // Show success message
             logout(); // Log the user out so they can log back in with their new role
         } catch (err) {
             setError(err.message);

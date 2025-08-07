@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { getCart, updateCartItem, removeFromCart, placeOrder } from '../../api/cart';
 import { getMyAddresses } from '../../api/address';
+import { useToast } from '../../contexts/ToastContext';
 import QuantitySelector from '../../components/quantityselector/QuantitySelector';
 import { Link, useNavigate } from 'react-router-dom';
 import './style.css';
@@ -20,6 +21,7 @@ function CartPage() {
     const { token } = useAuth();
     const { refreshCart } = useCart();
     const navigate = useNavigate();
+    const { addToast } = useToast();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,7 +71,7 @@ function CartPage() {
         }
         try {
             const result = await placeOrder({ shippingAddressId, billingAddressId: finalBillingId }, token);
-            alert(result.message);
+            addToast(result.message);
             navigate('/'); // Redirect to homepage after successful order
             await refreshCart();
         } catch (err) {

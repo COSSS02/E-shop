@@ -4,6 +4,7 @@ import { getProductById } from '../../api/products';
 import { addToCart } from '../../api/cart';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
+import { useToast } from '../../contexts/ToastContext';
 import './style.css';
 
 function ProductDetailPage() {
@@ -13,6 +14,7 @@ function ProductDetailPage() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { addToast } = useToast();
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -53,13 +55,13 @@ function ProductDetailPage() {
     const handleAddToCart = async () => {
 
         if (!token) {
-            alert("Please log in to add items to your cart.");
+            addToast("Please log in to add items to your cart.");
             return;
         }
 
         if (!product || !product.id) {
             console.error("2. Product data is not available.");
-            alert("Error: Product information is missing. Cannot add to cart.");
+            addToast("Error: Product information is missing. Cannot add to cart.");
             return;
         }
 
@@ -68,10 +70,10 @@ function ProductDetailPage() {
 
             await refreshCart();
 
-            // alert(`${product.name} has been added to your cart!`);
+            addToast(`${product.name} has been added to your cart!`);
         } catch (error) {
             console.error("ERROR during 'Add to Cart' process:", error);
-            alert(`An error occurred: ${error.message}`);
+            addToast(`An error occurred: ${error.message}`);
         }
     };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getProviderOrderItems, updateOrderItemStatus } from '../../api/cart';
+import { useToast } from '../../contexts/ToastContext';
 import { Link } from 'react-router-dom';
 import './style.css';
 
@@ -9,6 +10,7 @@ function ManageOrdersPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { token } = useAuth();
+    const { addToast } = useToast();
 
     const fetchOrderItems = async () => {
         if (!token) return;
@@ -33,7 +35,7 @@ function ManageOrdersPage() {
             // Refresh the list to show the updated status
             fetchOrderItems();
         } catch (err) {
-            alert(`Failed to update status: ${err.message}`);
+            addToast(`Failed to update status: ${err.message}`);
         }
     };
 

@@ -12,6 +12,7 @@ import AddProductPage from './pages/AddProductPage';
 import EditProductPage from './pages/EditProductPage';
 import MyProductsPage from './pages/MyProductsPage';
 import ManageOrdersPage from './pages/ManageOrdersPage';
+import { ToastProvider } from './contexts/ToastContext';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './App.css'
@@ -19,7 +20,7 @@ import './App.css'
 function App() {
   return (
     <Router>
-      {/* A Navbar component could go here, so it appears on every page */}
+      <ToastProvider>
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -66,8 +67,8 @@ function App() {
             </ProtectedRoute>
           } />
         </Routes>
-      </Layout>
-      {/* A Footer component could go here */}
+        </Layout>
+      </ToastProvider>
     </Router>
   );
 }
