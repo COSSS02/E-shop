@@ -35,7 +35,7 @@ function ManageOrdersPage() {
             // Refresh the list to show the updated status
             fetchOrderItems();
         } catch (err) {
-            addToast(`Failed to update status: ${err.message}`);
+            addToast(`Failed to update status: ${err.message}`, "error");
         }
     };
 

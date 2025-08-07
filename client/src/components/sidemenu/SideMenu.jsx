@@ -33,6 +33,9 @@ function SideMenu({ isOpen, closeMenu }) {
                 </div>
                 <div className="side-menu-links">
                     <Link to="/" onClick={handleLinkClick}>Home</Link>
+                    {user && (
+                        <Link to="/wishlist" onClick={handleLinkClick}>Wishlist</Link>
+                    )}
                     {user && user.role === 'admin' && (
                         <>
                             <Link to="/admin/add-category" onClick={handleLinkClick} className="admin-link">

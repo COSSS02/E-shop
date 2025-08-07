@@ -71,7 +71,7 @@ function CartPage() {
         }
         try {
             const result = await placeOrder({ shippingAddressId, billingAddressId: finalBillingId }, token);
-            addToast(result.message);
+            addToast(result.message, "success");
             navigate('/'); // Redirect to homepage after successful order
             await refreshCart();
         } catch (err) {

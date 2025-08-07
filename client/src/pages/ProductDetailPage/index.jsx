@@ -4,6 +4,7 @@ import { getProductById } from '../../api/products';
 import { addToCart } from '../../api/cart';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
+import { getWishlist, addToWishlist, removeFromWishlist } from '../../api/wishlist';
 import { useToast } from '../../contexts/ToastContext';
 import './style.css';
 
@@ -14,14 +15,28 @@ function ProductDetailPage() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isInWishlist, setIsInWishlist] = useState(false);
     const { addToast } = useToast();
 
     useEffect(() => {
-        const fetchProduct = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                const data = await getProductById(productId);
-                setProduct(data);
+
+                // Fetch product details and the user's wishlist in parallel
+                const productPromise = getProductById(productId);
+                const wishlistPromise = token ? getWishlist(token) : Promise.resolve([]); // Only fetch if logged in
+
+                const [productData, wishlistData] = await Promise.all([productPromise, wishlistPromise]);
+
+                setProduct(productData);
+
+                // Check if the current product is in the user's wishlist
+                if (wishlistData && productData) {
+                    const isProductInWishlist = wishlistData.some(item => item.id === productData.id);
+                    setIsInWishlist(isProductInWishlist);
+                }
+
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -29,8 +44,8 @@ function ProductDetailPage() {
             }
         };
 
-        fetchProduct();
-    }, [productId]); // Re-run effect if the productId in the URL changes
+        fetchData();
+    }, [productId, token]); // Re-run effect if the productId in the URL changes
 
     if (loading) {
         return <div className="product-detail-container"><p>Loading...</p></div>;
@@ -61,7 +76,7 @@ function ProductDetailPage() {
 
         if (!product || !product.id) {
             console.error("2. Product data is not available.");
-            addToast("Error: Product information is missing. Cannot add to cart.");
+            addToast("Error: Product information is missing. Cannot add to cart.","error");
             return;
         }
 
@@ -73,7 +88,26 @@ function ProductDetailPage() {
             addToast(`${product.name} has been added to your cart!`);
         } catch (error) {
             console.error("ERROR during 'Add to Cart' process:", error);
-            addToast(`An error occurred: ${error.message}`);
+            addToast(`An error occurred: ${error.message}`,"error");
+        }
+    };
+
+    const handleToggleWishlist = async () => {
+        if (!token) {
+            addToast("Please log in to manage your wishlist.");
+            return;
+        }
+        try {
+            if (isInWishlist) {
+                await removeFromWishlist(product.id, token);
+                addToast(`${product.name} removed from wishlist.`, "info");
+            } else {
+                await addToWishlist(product.id, token);
+                addToast(`${product.name} added to wishlist!`, "success");
+            }
+            setIsInWishlist(!isInWishlist);
+        } catch (err) {
+            addToast(`Error updating wishlist: ${err.message}`, "error");
         }
     };
 
@@ -100,6 +134,9 @@ function ProductDetailPage() {
                         <span className={`product-stock-status ${product.stock_quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
                             {product.stock_quantity > 0 ? `In Stock: ${product.stock_quantity}` : 'Out of Stock'}
                         </span>
+                        <button onClick={handleToggleWishlist} className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}>
+                            ❤
+                        </button>
                         <button
                             className="add-to-cart-btn"
                             disabled={product.stock_quantity === 0}

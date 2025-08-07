@@ -8,6 +8,7 @@ const categoryRoutes = require('./src/routes/category');
 const attributeRoutes = require('./src/routes/attribute');
 const cartRoutes = require('./src/routes/cart');
 const orderRoutes = require('./src/routes/orders');
+const wishlistRoutes = require('./src/routes/wishlist');
 
 const app = express();
 const port = 3000;
@@ -24,6 +25,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/attributes', attributeRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 app.get("/*splat", (req, res) => {
     console.log("Request received for:", req.url);

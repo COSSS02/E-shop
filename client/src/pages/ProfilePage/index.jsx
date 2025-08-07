@@ -54,7 +54,7 @@ function ProfilePage() {
     const handleProviderSubmit = async (providerData) => {
         try {
             const result = await upgradeToProvider(providerData, token);
-            addToast(result.message); // Show success message
+            addToast(result.message,"success"); // Show success message
             logout(); // Log the user out so they can log back in with their new role
         } catch (err) {
             setError(err.message);
