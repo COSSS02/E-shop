@@ -47,9 +47,26 @@ function ProfilePage() {
 // --- Sub-components for each tab ---
 
 const ProfileInfo = () => {
-    const { user, logout } = useAuth();
+    const { user} = useAuth();
     const { addToast } = useToast();
     const [showUpgradeForm, setShowUpgradeForm] = useState(false);
+    const [providerAddress, setProviderAddress] = useState(null);
+    const { token } = useAuth();
+
+    useEffect(() => {
+        if (user.role === 'provider') {
+            const fetchProviderAddress = async () => {
+                try {
+                    const allAddresses = await getMyAddresses(token);
+                    const pAddress = allAddresses.find(addr => addr.address_type === 'provider');
+                    setProviderAddress(pAddress);
+                } catch (error) {
+                    console.error("Failed to fetch provider address:", error);
+                }
+            };
+            fetchProviderAddress();
+        }
+    }, [user.role, token]);
 
     const handleUpgradeSuccess = () => {
         setShowUpgradeForm(false);
@@ -63,7 +80,19 @@ const ProfileInfo = () => {
             <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
             <p><strong>Email:</strong> {user.email}</p>
             {/* <p><strong>Role:</strong> <span style={{ textTransform: 'capitalize' }}>{user.role}</span></p> */}
-            {user.role === 'provider' && <p><strong>Company:</strong> {user.companyName}</p>}
+            {user.role === 'provider' && (
+                <>
+                    <p><strong>Company:</strong> {user.companyName || 'N/A'}</p>
+                    {providerAddress && (
+                        <div className="provider-address-display">
+                            <strong>Business Address:</strong>
+                            <p>
+                                {providerAddress.street}, {providerAddress.city}, {providerAddress.state} {providerAddress.zip_code}, {providerAddress.country}
+                            </p>
+                        </div>
+                    )}
+                </>
+            )}
 
             {user.role === 'client' && (
                 <div className="upgrade-section">
@@ -90,7 +119,9 @@ const Addresses = () => {
         setLoading(true);
         try {
             const data = await getMyAddresses(token);
-            setAddresses(data);
+            // Filter out the provider address so it doesn't show in this list
+            const customerAddresses = data.filter(addr => addr.address_type !== 'provider');
+            setAddresses(customerAddresses);
         } catch (error) {
             console.error("Failed to fetch addresses:", error);
         } finally {
@@ -113,12 +144,16 @@ const Addresses = () => {
         <div>
             <h2>My Addresses</h2>
             <div className="address-list">
-                {addresses.map(addr => (
-                    <div key={addr.id} className="address-card">
-                        <strong>{addr.address_type.charAt(0).toUpperCase() + addr.address_type.slice(1)} Address</strong>
-                        <p>{addr.street}, {addr.city}, {addr.state} {addr.zip_code}, {addr.country}</p>
-                    </div>
-                ))}
+                {addresses.length > 0 ? (
+                    addresses.map(addr => (
+                        <div key={addr.id} className="address-card">
+                            <strong>{addr.address_type.charAt(0).toUpperCase() + addr.address_type.slice(1)} Address</strong>
+                            <p>{addr.street}, {addr.city}, {addr.state} {addr.zip_code}, {addr.country}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p>You have not added any shipping or billing addresses yet.</p>
+                )}
             </div>
             <button onClick={() => setShowForm(!showForm)} className='add-address-button'>
                 {showForm ? 'Cancel' : 'Add New Address'}
