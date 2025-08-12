@@ -338,6 +338,46 @@ const Product = {
         const [products] = await db.query(productsSql, [limit, offset]);
 
         return { products, totalProducts: total };
+    },
+
+    /**
+     * Finds products for a provider that are below a certain stock threshold.
+     * @param {number} providerId - The ID of the provider.
+     * @param {number} threshold - The stock quantity to check against.
+     * @returns {Promise<Array>} A list of low-stock products.
+     */
+    async getLowStock(providerId, threshold = 5) {
+        const sql = `
+            SELECT id, name, stock_quantity
+            FROM products
+            WHERE provider_id = ? AND stock_quantity <= ? AND stock_quantity > 0
+            ORDER BY stock_quantity ASC;
+        `;
+        const [products] = await db.query(sql, [providerId, threshold]);
+        return products;
+    },
+
+    /**
+     * Finds the top-selling products for a provider.
+     * @param {number} providerId - The ID of the provider.
+     * @param {number} limit - The number of products to return.
+     * @returns {Promise<Array>} A list of top-selling products.
+     */
+    async getTopSellers(providerId, limit = 5) {
+        const sql = `
+            SELECT
+                p.id,
+                p.name,
+                SUM(oi.quantity) as total_sold
+            FROM products p
+            JOIN order_items oi ON p.id = oi.product_id
+            WHERE p.provider_id = ? AND oi.status NOT IN ('Cancelled', 'Pending')
+            GROUP BY p.id, p.name
+            ORDER BY total_sold DESC
+            LIMIT ?;
+        `;
+        const [products] = await db.query(sql, [providerId, limit]);
+        return products;
     }
 };
 

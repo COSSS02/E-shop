@@ -153,6 +153,50 @@ const Order = {
             throw new Error("Order item not found or you are not authorized to update it.");
         }
         return true;
+    },
+
+    /**
+     * Calculates sales statistics for a provider.
+     * @param {number} providerId - The ID of the provider.
+     * @returns {Promise<object>} An object with sales stats.
+     */
+    async getSalesStats(providerId) {
+        const sql = `
+            SELECT
+                COALESCE(SUM(oi.quantity * oi.price_at_purchase), 0) AS totalRevenue,
+                COUNT(DISTINCT oi.order_id) AS totalOrders,
+                COALESCE(SUM(oi.quantity), 0) AS totalItemsSold
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            WHERE p.provider_id = ? AND oi.status NOT IN ('Cancelled', 'Pending');
+        `;
+        const [[stats]] = await db.query(sql, [providerId]);
+        return stats;
+    },
+
+    /**
+     * Gets the most recent orders for a provider.
+     * @param {number} providerId - The ID of the provider.
+     * @param {number} limit - The number of orders to return.
+     * @returns {Promise<Array>} A list of recent orders.
+     */
+    async getRecentOrders(providerId, limit = 5) {
+        const sql = `
+            SELECT
+                o.id as order_id,
+                o.created_at,
+                SUM(oi.quantity * oi.price_at_purchase) as order_total,
+                (SELECT GROUP_CONCAT(p.name SEPARATOR ', ') FROM order_items oi_inner JOIN products p ON oi_inner.product_id = p.id WHERE oi_inner.order_id = o.id AND p.provider_id = ?) as product_names
+            FROM orders o
+            JOIN order_items oi ON o.id = oi.order_id
+            JOIN products p ON oi.product_id = p.id
+            WHERE p.provider_id = ?
+            GROUP BY o.id
+            ORDER BY o.created_at DESC
+            LIMIT ?;
+        `;
+        const [orders] = await db.query(sql, [providerId, providerId, limit]);
+        return orders;
     }
 };
 

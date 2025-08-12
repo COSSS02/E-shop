@@ -45,13 +45,6 @@ function SideMenu({ isOpen, closeMenu }) {
                     )}
                     {user && user.role === 'provider' && (
                         <>
-                            <Link to="/provider/add-product" onClick={handleLinkClick} className="admin-link">
-                                Add Product
-                            </Link>
-                        </>
-                    )}
-                    {user && user.role === 'provider' && (
-                        <>
                             <Link to="/provider/my-products" onClick={handleLinkClick} className="admin-link">
                                 My Products
                             </Link>
@@ -59,8 +52,22 @@ function SideMenu({ isOpen, closeMenu }) {
                     )}
                     {user && user.role === 'provider' && (
                         <>
+                            <Link to="/provider/add-product" onClick={handleLinkClick} className="admin-link">
+                                Add Product
+                            </Link>
+                        </>
+                    )}
+                    {user && user.role === 'provider' && (
+                        <>
                             <Link to="/provider/manage-orders" onClick={handleLinkClick} className="admin-link">
                                 Manage Orders
+                            </Link>
+                        </>
+                    )}
+                    {user && user.role === 'provider' && (
+                        <>
+                            <Link to="/provider/dashboard" onClick={handleLinkClick} className="admin-link">
+                                Dashboard
                             </Link>
                         </>
                     )}

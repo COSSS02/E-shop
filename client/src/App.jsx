@@ -8,6 +8,7 @@ import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 import CartPage from './pages/CartPage';
 import WishlistPage from './pages/WishlistPage';
+import DashboardPage from './pages/DashboardPage';
 import AddCategoryPage from './pages/AddCategoryPage';
 import AddProductPage from './pages/AddProductPage';
 import EditProductPage from './pages/EditProductPage';
@@ -60,6 +61,11 @@ function App() {
             <Route path="/provider/manage-orders" element={
               <ProtectedRoute roles={['provider']}>
                 <ManageOrdersPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/provider/dashboard" element={
+              <ProtectedRoute roles={['provider']}>
+                <DashboardPage />
               </ProtectedRoute>
             } />
             <Route path="/wishlist" element={
