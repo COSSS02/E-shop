@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const db = require('./src/config/db');
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/user');
 const dashboardRoutes = require('./src/routes/dashboard');

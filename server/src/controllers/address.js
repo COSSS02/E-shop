@@ -32,6 +32,44 @@ const addressController = {
         } catch (error) {
             res.status(500).json({ message: "Error retrieving addresses", error: error.message });
         }
+    },
+
+    /**
+     * (Admin) Get all addresses across the platform.
+     */
+    async getAllAddresses(req, res) {
+        try {
+            const rows = await Address.findAllWithUsers();
+            res.status(200).json(rows);
+        } catch (error) {
+            res.status(500).json({ message: "Error fetching addresses", error: error.message });
+        }
+    },
+
+    /**
+     * (Admin) Update an address by ID.
+     */
+    async updateAddress(req, res) {
+        try {
+            const { addressId } = req.params;
+            await Address.update(addressId, req.body);
+            res.status(200).json({ message: "Address updated successfully." });
+        } catch (error) {
+            res.status(500).json({ message: "Error updating address", error: error.message });
+        }
+    },
+
+    /**
+     * (Admin) Delete an address by ID.
+     */
+    async deleteAddress(req, res) {
+        try {
+            const { addressId } = req.params;
+            await Address.delete(addressId);
+            res.status(200).json({ message: "Address deleted successfully." });
+        } catch (error) {
+            res.status(500).json({ message: "Error deleting address", error: error.message });
+        }
     }
 };
 

@@ -14,6 +14,8 @@ import AddProductPage from './pages/AddProductPage';
 import EditProductPage from './pages/EditProductPage';
 import MyProductsPage from './pages/MyProductsPage';
 import ManageOrdersPage from './pages/ManageOrdersPage';
+import AdminUserManagementPage from './pages/AdminUserManagementPage';
+import AdminAddressManagementPage from './pages/AdminAddressManagementPage';
 import { ToastProvider } from './contexts/ToastContext';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -36,6 +38,16 @@ function App() {
             <Route path="/profile" element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/user-management" element={
+              <ProtectedRoute roles={['admin']}>
+                <AdminUserManagementPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/address-management" element={
+              <ProtectedRoute roles={['admin']}>
+                <AdminAddressManagementPage />
               </ProtectedRoute>
             } />
             <Route path="/admin/add-category" element={

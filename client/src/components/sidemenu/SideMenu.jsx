@@ -38,6 +38,20 @@ function SideMenu({ isOpen, closeMenu }) {
                     )}
                     {user && user.role === 'admin' && (
                         <>
+                            <Link to="/admin/user-management" onClick={handleLinkClick} className="admin-link">
+                                User Management
+                            </Link>
+                        </>
+                    )}
+                    {user && user.role === 'admin' && (
+                        <>
+                            <Link to="/admin/address-management" onClick={handleLinkClick} className="admin-link">
+                                Address Management
+                            </Link>
+                        </>
+                    )}
+                    {user && user.role === 'admin' && (
+                        <>
                             <Link to="/admin/add-category" onClick={handleLinkClick} className="admin-link">
                                 Add Category
                             </Link>

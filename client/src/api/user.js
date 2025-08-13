@@ -29,3 +29,30 @@ export const deleteAccount = async (password, token) => {
     });
     return handleResponse(response);
 };
+
+export const getAllUsers = async (token) => {
+    const response = await fetch('/api/users', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return handleResponse(response);
+};
+
+export const updateUserAsAdmin = async (userId, userData, token) => {
+    const response = await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(userData)
+    });
+    return handleResponse(response);
+};
+
+export const deleteUserAsAdmin = async (userId, token) => {
+    const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return handleResponse(response);
+};

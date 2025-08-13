@@ -106,6 +106,46 @@ const User = {
         // Assumes ON DELETE CASCADE is set for related tables (orders, addresses, etc.)
         await db.query('DELETE FROM users WHERE id = ?', [userId]);
         return true;
+    },
+
+    /**
+     * (Admin) Finds all users for the management dashboard.
+     */
+    async findAll() {
+        const sql = `
+            SELECT id, first_name, last_name, email, role, company_name, created_at
+            FROM users
+            ORDER BY created_at DESC;
+        `;
+        const [users] = await db.query(sql);
+        return users;
+    },
+
+    /**
+     * (Admin) Updates a user's details.
+     * @param {number} userId - The ID of the user to update.
+     * @param {object} userData - An object with the fields to update.
+     */
+    async updateUserAsAdmin(userId, { firstName, lastName, email, role, companyName }) {
+        const sql = `
+            UPDATE users SET
+                first_name = ?,
+                last_name = ?,
+                email = ?,
+                role = ?,
+                company_name = ?
+            WHERE id = ?;
+        `;
+        await db.query(sql, [firstName, lastName, email, role, companyName, userId]);
+    },
+
+    /**
+     * (Admin) Deletes a user account by its ID.
+     * @param {number} userId - The ID of the user to delete.
+     */
+    async deleteById(userId) {
+        // Assumes ON DELETE CASCADE is set for related tables
+        await db.query('DELETE FROM users WHERE id = ?', [userId]);
     }
 };
 
