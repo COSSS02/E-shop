@@ -34,14 +34,14 @@ const productController = {
     async updateProduct(req, res) {
         try {
             const { id } = req.params;
-            const userId = req.user.id;
+            const user = req.user;
             const { productData, attributesData } = req.body;
 
             if (!productData || !attributesData) {
                 return res.status(400).json({ message: "Missing productData or attributesData." });
             }
 
-            await Product.update(Number(id), userId, productData, attributesData);
+            await Product.update(Number(id), user, productData, attributesData);
             res.status(200).json({ message: "Product updated successfully", productId: id });
 
         } catch (error) {
@@ -53,6 +53,22 @@ const productController = {
                 return res.status(404).json({ message: error.message });
             }
             res.status(500).json({ message: "Error updating product", error: error.message });
+        }
+    },
+
+    /**
+     * (Admin) Handles deleting a product.
+     */
+    async deleteProduct(req, res) {
+        try {
+            const { id } = req.params;
+            await Product.delete(Number(id))
+            res.status(200).json({ message: "Product deleted successfully." });
+        } catch (error) {
+            if (error.message.includes("not found")) {
+                return res.status(404).json({ message: error.message });
+            }
+            res.status(500).json({ message: "Error deleting product", error: error.message });
         }
     },
 
@@ -188,10 +204,12 @@ const productController = {
             const page = parseInt(req.query.page, 10) || 1;
             const offset = (page - 1) * limit;
 
+            const q = req.query.q || '';
+
             const sort = req.query.sort || 'name-asc'; // e.g., 'price-asc'
             const [sortBy, sortOrder] = sort.split('-');
 
-            const { products, totalProducts } = await Product.findAll(limit, offset, sortBy, sortOrder);
+            const { products, totalProducts } = await Product.findAll(limit, offset, sortBy, sortOrder, q);
 
             res.status(200).json({
                 products,

@@ -8,14 +8,15 @@ import RegisterPage from './pages/Auth/RegisterPage';
 import ProfilePage from './pages/User/ProfilePage';
 import CartPage from './pages/User/CartPage';
 import WishlistPage from './pages/User/WishlistPage';
-import ProviderDashboardPage from './pages/Provider/ProviderDashboardPage';
+import MyProductsPage from './pages/Provider/MyProductsPage';
 import AddProductPage from './pages/Provider/AddProductPage';
 import EditProductPage from './pages/Provider/EditProductPage';
-import MyProductsPage from './pages/Provider/MyProductsPage';
 import ManageOrdersPage from './pages/Provider/ManageOrdersPage';
+import ProviderDashboardPage from './pages/Provider/ProviderDashboardPage';
 import AddCategoryPage from './pages/Admin/AddCategoryPage';
-import AdminUserManagementPage from './pages/Admin/AdminUserManagementPage';
-import AdminAddressManagementPage from './pages/Admin/AdminAddressManagementPage';
+import UserManagementPage from './pages/Admin/UserManagementPage';
+import AddressManagementPage from './pages/Admin/AddressManagementPage';
+import ProductManagementPage from './pages/Admin/ProductManagementPage';
 import { ToastProvider } from './contexts/ToastContext';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -42,12 +43,17 @@ function App() {
             } />
             <Route path="/admin/user-management" element={
               <ProtectedRoute roles={['admin']}>
-                <AdminUserManagementPage />
+                <UserManagementPage />
               </ProtectedRoute>
             } />
             <Route path="/admin/address-management" element={
               <ProtectedRoute roles={['admin']}>
-                <AdminAddressManagementPage />
+                <AddressManagementPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/product-management" element={
+              <ProtectedRoute roles={['admin']}>
+                <ProductManagementPage />
               </ProtectedRoute>
             } />
             <Route path="/admin/add-category" element={
@@ -61,7 +67,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/provider/edit-product/:productId" element={
-              <ProtectedRoute roles={['provider']}>
+              <ProtectedRoute roles={['provider', 'admin']}>
                 <EditProductPage />
               </ProtectedRoute>
             } />

@@ -38,7 +38,7 @@ function EditProductPage() {
                 ]);
 
                 // Security check: Does the logged-in user own this product?
-                if (user && productData.provider_id !== user.id) {
+                if (user && user.role !== 'admin' && productData.provider_id !== user.id) {
                     setError("You are not authorized to edit this product.");
                     return;
                 }

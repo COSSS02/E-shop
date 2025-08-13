@@ -144,7 +144,7 @@ function ProductDetailPage() {
                         >
                             Add to Cart
                         </button>
-                        {user && user.id === product.provider_id && (
+                        {user && (user.role === 'admin' || user.id === product.provider_id) && (
                             <Link to={`/provider/edit-product/${product.id}`} className="edit-product-btn">
                                 Edit Product
                             </Link>

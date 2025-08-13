@@ -25,4 +25,7 @@ router.get('/:id', productController.getProductById);
 // PUT /api/products/:id - Update a product by its ID
 router.put('/:id', authMiddleware, productController.updateProduct);
 
+// DELETE /api/products/:id - Delete a product by its ID (Admin only)
+router.delete('/:id', authMiddleware, checkRole(['admin']), productController.deleteProduct);
+
 module.exports = router;

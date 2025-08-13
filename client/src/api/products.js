@@ -1,7 +1,7 @@
-export const getAllProducts = async (page = 1, sort = 'name-asc') => {
+export const getAllProducts = async (page = 1, sort = 'name-asc', searchTerm = '') => {
     try {
         // Append the page number to the request URL
-        const response = await fetch(`/api/products?page=${page}&sort=${sort}`);
+        const response = await fetch(`/api/products?page=${page}&sort=${sort}&q=${encodeURIComponent(searchTerm)}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -112,6 +112,25 @@ export const updateProduct = async (productId, productPayload, token) => {
         return data;
     } catch (error) {
         console.error("Failed to update product:", error);
+        throw error;
+    }
+};
+
+export const deleteProduct = async (productId, token) => {
+    try {
+        const response = await fetch(`/api/products/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to delete product.');
+        }
+        return data;
+    } catch (error) {
+        console.error("Failed to delete product:", error);
         throw error;
     }
 };

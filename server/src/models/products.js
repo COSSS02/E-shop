@@ -74,12 +74,12 @@ const Product = {
     /**
      * Updates an existing product and its attributes.
      * @param {number} productId - The ID of the product to update.
-     * @param {number} userId - The ID of the user attempting the update (for authorization).
+     * @param {number} user - The authenticated user object (containing id and role).
      * @param {object} productData - The core product data to update.
      * @param {Array<object>} attributesData - The new set of attributes for the product.
      * @returns {Promise<boolean>} True on success.
      */
-    async update(productId, userId, productData, attributesData) {
+    async update(productId, user, productData, attributesData) {
         const connection = await db.getConnection();
         try {
             await connection.beginTransaction();
@@ -87,7 +87,7 @@ const Product = {
             // Security Check: Verify the user owns the product before updating.
             const [productRows] = await connection.query('SELECT provider_id FROM products WHERE id = ?', [productId]);
             if (productRows.length === 0) throw new Error("Product not found.");
-            if (productRows[0].provider_id !== userId) throw new Error("User not authorized to edit this product.");
+            if (user.role !== 'admin' && productRows[0].provider_id !== user.id) throw new Error("User not authorized to edit this product.");
 
             // 1. Update the core product details
             await connection.query('UPDATE products SET ? WHERE id = ?', [productData, productId]);
@@ -124,6 +124,21 @@ const Product = {
         } finally {
             connection.release();
         }
+    },
+
+    /**
+     * (Admin) Deletes a product from the database.
+     * @param {number} productId - The ID of the product to delete.
+     * @returns {Promise<boolean>} True on success.
+     */
+    async delete(productId) {
+        // The database schema should have ON DELETE CASCADE for product_attributes,
+        // so they will be deleted automatically with the product.
+        const [result] = await db.query('DELETE FROM products WHERE id = ?', [productId]);
+        if (result.affectedRows === 0) {
+            throw new Error("Product not found or already deleted.");
+        }
+        return true;
     },
 
     /**
@@ -311,31 +326,66 @@ const Product = {
      * @param {string} sortOrder - The sort order ('ASC' or 'DESC').
      * @returns {Promise<object>} An object containing the products array and the total count.
      */
-    async findAll(limit, offset, sortBy = 'name', sortOrder = 'ASC') {
-        // Whitelist of allowed columns for sorting to prevent SQL injection
+    async findAll(limit, offset, sortBy = 'name', sortOrder = 'ASC', searchTerm = '') {
+        // Whitelist of allowed columns and orders
         const allowedSortBy = ['name', 'price', 'stock_quantity', 'created_at'];
         const allowedSortOrder = ['ASC', 'DESC'];
 
-        // Validate and sanitize sort parameters, defaulting to 'newest'
-        const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
+        // 1. Validate and sanitize user input
+        const sortByInput = allowedSortBy.includes(sortBy) ? sortBy : 'name';
         const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
 
-        // First, get the total count of all products for pagination metadata
-        const countSql = `SELECT COUNT(*) as total FROM products`;
-        const [[{ total }]] = await db.query(countSql);
+        // 2. Map the clean input to the fully qualified and unambiguous SQL column name
+        const sortColumnMap = {
+            name: 'p.name',
+            price: 'p.price',
+            stock_quantity: 'p.stock_quantity',
+            created_at: 'p.created_at'
+        };
+        const safeSortColumn = sortColumnMap[sortByInput];
 
-        // Then, get the paginated list of products with dynamic sorting
-        const productsSql = `
-            SELECT
-                p.id, p.name, p.description, p.price, p.stock_quantity,
-                c.name as category_name
+        const searchPattern = `%${searchTerm}%`;
+
+        // Build the WHERE clause for searching
+        const whereClause = `
+            WHERE (p.name LIKE ? OR
+                   p.description LIKE ? OR
+                   c.name LIKE ? OR
+                   u.company_name LIKE ? OR
+                   CONCAT(u.first_name, ' ', u.last_name) LIKE ?)
+        `;
+        const searchParams = [searchPattern, searchPattern, searchPattern, searchPattern, searchPattern];
+
+        // First, get the total count of all products for pagination metadata
+        const countSql = `
+            SELECT COUNT(*) as total
             FROM products p
             JOIN categories c ON p.category_id = c.id
-            ORDER BY ${safeSortBy} ${safeSortOrder}
-            LIMIT ?
-            OFFSET ?
+            JOIN users u ON p.provider_id = u.id
+            ${searchTerm ? whereClause : ''}
         `;
-        const [products] = await db.query(productsSql, [limit, offset]);
+        const [[{ total }]] = await db.query(countSql, searchTerm ? searchParams : []);
+
+        // Then, get the paginated list of products
+        const productsSql = `
+            SELECT
+                p.id, p.name, p.description, p.price, p.stock_quantity, p.created_at,
+                c.name as category_name,
+                u.first_name as provider_first_name,
+                u.last_name as provider_last_name,
+                u.company_name as provider_company_name
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            JOIN users u ON p.provider_id = u.id
+            ${searchTerm ? whereClause : ''}
+            ORDER BY ?? ${safeSortOrder}
+            LIMIT ?
+            OFFSET ?;
+        `;
+
+        // Execute the query with the safe column name as a parameter
+        const queryParams = searchTerm ? [...searchParams, safeSortColumn, limit, offset] : [safeSortColumn, limit, offset];
+        const [products] = await db.query(productsSql, queryParams);
 
         return { products, totalProducts: total };
     },
