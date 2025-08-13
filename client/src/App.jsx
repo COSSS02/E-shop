@@ -1,21 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ProductDetailPage from './pages/ProductDetailPage';
-import CategoryPage from './pages/CategoryPage';
-import SearchPage from './pages/SearchPage';
-import ProfilePage from './pages/ProfilePage';
-import CartPage from './pages/CartPage';
-import WishlistPage from './pages/WishlistPage';
-import DashboardPage from './pages/DashboardPage';
-import AddCategoryPage from './pages/AddCategoryPage';
-import AddProductPage from './pages/AddProductPage';
-import EditProductPage from './pages/EditProductPage';
-import MyProductsPage from './pages/MyProductsPage';
-import ManageOrdersPage from './pages/ManageOrdersPage';
-import AdminUserManagementPage from './pages/AdminUserManagementPage';
-import AdminAddressManagementPage from './pages/AdminAddressManagementPage';
+import HomePage from './pages/General/HomePage';
+import CategoryPage from './pages/General/CategoryPage';
+import SearchPage from './pages/General/SearchPage';
+import ProductDetailPage from './pages/General/ProductDetailPage';
+import LoginPage from './pages/Auth/LoginPage';
+import RegisterPage from './pages/Auth/RegisterPage';
+import ProfilePage from './pages/User/ProfilePage';
+import CartPage from './pages/User/CartPage';
+import WishlistPage from './pages/User/WishlistPage';
+import ProviderDashboardPage from './pages/Provider/ProviderDashboardPage';
+import AddProductPage from './pages/Provider/AddProductPage';
+import EditProductPage from './pages/Provider/EditProductPage';
+import MyProductsPage from './pages/Provider/MyProductsPage';
+import ManageOrdersPage from './pages/Provider/ManageOrdersPage';
+import AddCategoryPage from './pages/Admin/AddCategoryPage';
+import AdminUserManagementPage from './pages/Admin/AdminUserManagementPage';
+import AdminAddressManagementPage from './pages/Admin/AdminAddressManagementPage';
 import { ToastProvider } from './contexts/ToastContext';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -77,7 +77,7 @@ function App() {
             } />
             <Route path="/provider/dashboard" element={
               <ProtectedRoute roles={['provider']}>
-                <DashboardPage />
+                <ProviderDashboardPage />
               </ProtectedRoute>
             } />
             <Route path="/wishlist" element={
