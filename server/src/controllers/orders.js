@@ -42,22 +42,56 @@ const orderController = {
      */
     async updateOrderItemStatus(req, res) {
         try {
-            const { itemId } = req.params;
+            const { orderItemId } = req.params;
             const { status } = req.body;
-            const providerId = req.user.id;
+            const user = req.user;
 
             const allowedStatuses = ['Processing', 'Shipped', 'Delivered', 'Cancelled'];
             if (!status || !allowedStatuses.includes(status)) {
                 return res.status(400).json({ message: "Invalid status provided." });
             }
 
-            await Order.updateItemStatus(itemId, providerId, status);
+            await Order.updateItemStatus(orderItemId, user, status);
             res.status(200).json({ message: `Order item status updated to ${status}` });
         } catch (error) {
             if (error.message.includes("not found or you are not authorized")) {
                 return res.status(404).json({ message: error.message });
             }
             res.status(500).json({ message: "Error updating order item status", error: error.message });
+        }
+    },
+
+    /**
+     * (Admin) Handles retrieving all orders for the admin dashboard.
+     */
+    async getAllOrders(req, res) {
+        try {
+            const { page = 1, sort = 'created_at-desc', q = '' } = req.query;
+            const limit = 20;
+            const offset = (page - 1) * limit;
+
+            let [sortBy, sortOrder] = sort.split('-');
+            if (!['id', 'created_at', 'total_amount'].includes(sortBy)) {
+                sortBy = 'created_at'; // Default sort column
+            }
+            if (!['asc', 'desc'].includes(sortOrder)) {
+                sortOrder = 'desc';
+            }
+
+            const { orders, totalOrders } = await Order.findAll({
+                limit, offset, sortBy, sortOrder, searchTerm: q
+            });
+
+            res.status(200).json({
+                orders,
+                pagination: {
+                    currentPage: Number(page),
+                    totalPages: Math.ceil(totalOrders / limit),
+                    totalItems: totalOrders
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ message: "Error retrieving all orders", error: error.message });
         }
     }
 };

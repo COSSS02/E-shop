@@ -4,15 +4,18 @@ const orderController = require('../controllers/orders');
 const authMiddleware = require('../middleware/auth');
 const checkRole = require('../middleware/role');
 
-router.post('/', authMiddleware, orderController.createOrder);
+// All routes require authentication
+router.use(authMiddleware);
 
-// GET /api/orders/my-orders - Get all orders for the logged-in user
-router.get('/my-orders', authMiddleware, orderController.getUserOrders);
+// --- User-facing routes ---
+router.post('/', orderController.createOrder);
+router.get('/', orderController.getUserOrders);
 
-// GET /api/orders/provider - Get all order items for the logged-in provider
-router.get('/provider', authMiddleware, checkRole(['provider']), orderController.getProviderOrderItems);
+// --- Provider-facing routes ---
+router.get('/provider', checkRole(['provider']), orderController.getProviderOrderItems);
+router.patch('/items/:orderItemId', checkRole(['provider', 'admin']), orderController.updateOrderItemStatus);
 
-// PATCH /api/orders/items/:itemId - Update the status of a specific order item
-router.patch('/items/:itemId', authMiddleware, checkRole(['provider']), orderController.updateOrderItemStatus);
+// --- Admin-facing routes ---
+router.get('/all', checkRole(['admin']), orderController.getAllOrders);
 
 module.exports = router;

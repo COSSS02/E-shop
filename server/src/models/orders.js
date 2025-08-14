@@ -135,18 +135,33 @@ const Order = {
     /**
      * Updates the status of a single order item, ensuring the provider has ownership.
      * @param {number} orderItemId - The ID of the order_items record.
-     * @param {number} providerId - The ID of the provider making the request.
+     * @param {number} user - The user making the request.
      * @param {string} newStatus - The new status to set.
      * @returns {Promise<boolean>} True if the update was successful.
      */
-    async updateItemStatus(orderItemId, providerId, newStatus) {
-        const sql = `
-            UPDATE order_items oi
-            JOIN products p ON oi.product_id = p.id
-            SET oi.status = ?
-            WHERE oi.id = ? AND p.provider_id = ?;
-        `;
-        const [result] = await db.query(sql, [newStatus, orderItemId, providerId]);
+    async updateItemStatus(orderItemId, user, newStatus) {
+        let sql;
+        let params;
+
+        if (user.role === 'admin') {
+            // Admin can update any item status directly
+            sql = `UPDATE order_items SET status = ? WHERE id = ?;`;
+            params = [newStatus, orderItemId];
+        } else if (user.role === 'provider') {
+            // Provider must own the product associated with the order item
+            sql = `
+                UPDATE order_items oi
+                JOIN products p ON oi.product_id = p.id
+                SET oi.status = ?
+                WHERE oi.id = ? AND p.provider_id = ?;
+            `;
+            params = [newStatus, orderItemId, user.id];
+        } else {
+            // Other roles are not authorized
+            throw new Error("User not authorized to update order status.");
+        }
+
+        const [result] = await db.query(sql, params);
 
         if (result.affectedRows === 0) {
             // This means the item was not found OR the provider was not authorized.
@@ -197,6 +212,83 @@ const Order = {
         `;
         const [orders] = await db.query(sql, [providerId, providerId, limit]);
         return orders;
+    },
+
+    /**
+     * (Admin) Finds all orders on the platform with searching and pagination.
+     */
+    async findAll({ limit, offset, sortBy, sortOrder, searchTerm }) {
+        const searchPattern = `%${searchTerm}%`;
+
+        const whereClause = `
+            WHERE (o.id LIKE ? OR
+                   u.email LIKE ? OR
+                   CONCAT(u.first_name, ' ', u.last_name) LIKE ?)
+        `;
+        const searchParams = [searchPattern, searchPattern, searchPattern];
+
+        // Get total count for pagination
+        const countSql = `
+            SELECT COUNT(o.id) as total
+            FROM orders o
+            JOIN users u ON o.user_id = u.id
+            ${searchTerm ? whereClause : ''}
+        `;
+        const [[{ total }]] = await db.query(countSql, searchTerm ? searchParams : []);
+
+        // Get paginated orders
+        const ordersSql = `
+            SELECT
+                o.id,
+                o.user_id,
+                o.total_amount,
+                o.created_at,
+                u.first_name,
+                u.last_name,
+                u.email,
+                sa.street as shipping_street,
+                sa.city as shipping_city
+            FROM orders o
+            JOIN users u ON o.user_id = u.id
+            LEFT JOIN addresses sa ON o.shipping_address_id = sa.id
+            ${searchTerm ? whereClause : ''}
+            ORDER BY o.${sortBy} ${sortOrder}
+            LIMIT ?
+            OFFSET ?;
+        `;
+
+        const queryParams = searchTerm ? [...searchParams, limit, offset] : [limit, offset];
+        const [orders] = await db.query(ordersSql, queryParams);
+
+        // If no orders are found, return early
+        if (orders.length === 0) {
+            return { orders: [], totalOrders: total };
+        }
+
+        // Fetch all items for the retrieved orders in a single query
+        const orderIds = orders.map(o => o.id);
+        const itemsSql = `
+            SELECT
+                oi.id as order_item_id,
+                oi.order_id,
+                oi.product_id,
+                oi.quantity,
+                oi.price_at_purchase,
+                oi.status,
+                p.name as product_name
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id IN (?)
+        `;
+        const [items] = await db.query(itemsSql, [orderIds]);
+
+        // Map items back to their respective orders
+        const ordersWithItems = orders.map(order => ({
+            ...order,
+            items: items.filter(item => item.order_id === order.id)
+        }));
+
+        return { orders: ordersWithItems, totalOrders: total };
     }
 };
 

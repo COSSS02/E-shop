@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { getMyAddresses, createAddress } from '../../../api/address';
-import { getMyOrders } from '../../../api/cart';
+import { getMyOrders } from '../../../api/orders';
 import { upgradeToProvider } from '../../../api/auth';
 import { changePassword, deleteAccount } from '../../../api/user';
 import OrderHistory from '../../../components/orderhistory/OrderHistory';
@@ -169,8 +169,16 @@ const OrderHistoryTab = () => {
     const { token } = useAuth();
 
     useEffect(() => {
+        if (!token) {
+            setLoading(false);
+            return;
+        }
         getMyOrders(token)
             .then(setOrders)
+            .catch(err => {
+                console.error("Failed to fetch order history:", err);
+                // You can also add a toast notification here to inform the user
+            })
             .finally(() => setLoading(false));
     }, [token]);
 

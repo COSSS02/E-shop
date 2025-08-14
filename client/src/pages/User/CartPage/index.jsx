@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
-import { getCart, updateCartItem, removeFromCart, placeOrder } from '../../../api/cart';
+import { getCart, updateCartItem, removeFromCart } from '../../../api/cart';
+import { placeOrder } from '../../../api/orders';
 import { getMyAddresses } from '../../../api/address';
 import { useToast } from '../../../contexts/ToastContext';
 import QuantitySelector from '../../../components/quantityselector/QuantitySelector';

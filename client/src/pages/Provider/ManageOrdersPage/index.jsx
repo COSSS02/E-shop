@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { getProviderOrderItems, updateOrderItemStatus } from '../../../api/cart';
+import { getProviderOrderItems, updateOrderItemStatus } from '../../../api/orders';
 import { useToast } from '../../../contexts/ToastContext';
 import { Link } from 'react-router-dom';
 import './style.css';
