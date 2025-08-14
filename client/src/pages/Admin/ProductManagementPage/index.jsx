@@ -16,64 +16,89 @@ function AdminProductManagementPage() {
     const { addToast } = useToast();
     const [searchParams, setSearchParams] = useSearchParams();
 
+    // Read search params from URL
     const { currentPage, currentSort, currentSearch } = useMemo(() => ({
         currentPage: parseInt(searchParams.get('page') || '1', 10),
         currentSort: searchParams.get('sort') || 'name-asc',
         currentSearch: searchParams.get('q') || ''
     }), [searchParams]);
 
-    const fetchProducts = async () => {
-        try {
-            setLoading(true);
-            const data = await getAllProducts(currentPage, currentSort, currentSearch);
-            setProducts(data.products);
-            setPagination(data.pagination);
-        } catch (err) {
-            setError("Failed to load products.");
-            addToast("Failed to load products.", "error");
-        } finally {
-            setLoading(false);
-        }
-    };
+    // State for the search input field, which we will debounce
+    const [inputValue, setInputValue] = useState(currentSearch);
 
+    // Effect to fetch products whenever URL params change
     useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const data = await getAllProducts(currentPage, currentSort, currentSearch);
+                setProducts(data.products);
+                setPagination(data.pagination);
+            } catch (err) {
+                setError("Failed to load products.");
+                addToast("Failed to load products.", "error");
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchProducts();
     }, [currentPage, currentSort, currentSearch]);
+
+    // Debouncing effect for the search input
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            // Only update the URL if the input value is different from the current search param
+            if (inputValue !== currentSearch) {
+                setSearchParams({ q: inputValue, sort: currentSort, page: 1 }, { replace: true });
+            }
+        }, 500); // 500ms delay
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [inputValue, currentSearch, currentSort, setSearchParams]);
 
     const handleDelete = async (productId, productName) => {
         if (window.confirm(`Are you sure you want to delete "${productName}"? This action is permanent.`)) {
             try {
                 await deleteProduct(productId, token);
                 addToast("Product deleted successfully.", "success");
-                fetchProducts(); // Refresh the list
+                // Re-fetch products for the current page after deletion
+                const data = await getAllProducts(currentPage, currentSort, currentSearch);
+                setProducts(data.products);
+                setPagination(data.pagination);
+                // If the last item on a page is deleted, go to the previous page
+                if (data.products.length === 0 && currentPage > 1) {
+                    handlePageChange(currentPage - 1);
+                }
             } catch (err) {
                 addToast(`Failed to delete product: ${err.message}`, "error");
             }
         }
     };
 
-    const handlePageChange = (newPage) => setSearchParams({ sort: currentSort, page: newPage });
-    const handleSortChange = (e) => setSearchParams({ sort: e.target.value, page: 1 });
+    // Corrected handlers to preserve all search params
+    const handlePageChange = (newPage) => setSearchParams({ q: currentSearch, sort: currentSort, page: newPage });
+    const handleSortChange = (e) => setSearchParams({ q: currentSearch, sort: e.target.value, page: 1 });
     const handleSearchChange = (e) => {
-        // This could be debounced in a real app for performance
-        setSearchParams({ q: e.target.value, sort: currentSort, page: 1 });
+        setInputValue(e.target.value);
     };
 
     if (error) return <div className="admin-product-container"><p className="error-message">{error}</p></div>;
 
     return (
         <div className="admin-product-container">
-                <h1>Product Management</h1>
-                <div className="toolbar">
-                    <input
-                        type="text"
-                        placeholder="Search products, categories, providers..."
-                        value={currentSearch}
-                        onChange={handleSearchChange}
-                        className="search-input"
-                    />
-                    <SortControl currentSort={currentSort} onSortChange={handleSortChange} />
-                </div>
+            <h1>Product Management</h1>
+            <div className="toolbar">
+                <input
+                    type="text"
+                    placeholder="Search products, categories, providers..."
+                    value={inputValue}
+                    onChange={handleSearchChange}
+                    className="search-input"
+                />
+                <SortControl currentSort={currentSort} onSortChange={handleSortChange} />
+            </div>
 
             {loading ? <p>Loading products...</p> : (
                 <>
