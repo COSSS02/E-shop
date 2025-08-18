@@ -18,6 +18,7 @@ import UserManagementPage from './pages/Admin/UserManagementPage';
 import AddressManagementPage from './pages/Admin/AddressManagementPage';
 import ProductManagementPage from './pages/Admin/ProductManagementPage';
 import OrderManagementPage from './pages/Admin/OrderManagementPage';
+import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 import { ToastProvider } from './contexts/ToastContext';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -65,6 +66,11 @@ function App() {
             <Route path="/admin/add-category" element={
               <ProtectedRoute roles={['admin']}>
                 <AddCategoryPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/dashboard" element={
+              <ProtectedRoute roles={['admin']}>
+                <AdminDashboardPage />
               </ProtectedRoute>
             } />
             <Route path="/provider/add-product" element={

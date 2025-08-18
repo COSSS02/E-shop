@@ -87,6 +87,13 @@ function SideMenu({ isOpen, closeMenu }) {
                             </Link>
                         </>
                     )}
+                    {user && user.role === 'admin' && (
+                        <>
+                            <Link to="/admin/dashboard" onClick={handleLinkClick} className="admin-link">
+                                Dashboard
+                            </Link>
+                        </>
+                    )}
                     {user && user.role === 'provider' && (
                         <>
                             <Link to="/provider/my-products" onClick={handleLinkClick} className="admin-link">

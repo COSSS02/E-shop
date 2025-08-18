@@ -289,6 +289,34 @@ const Order = {
         }));
 
         return { orders: ordersWithItems, totalOrders: total };
+    },
+
+    /**
+     * (Admin) Gets platform-wide sales statistics.
+     */
+    async getPlatformSalesStats() {
+        const [[sales]] = await db.query(`
+            SELECT
+                SUM(total_amount) as totalRevenue,
+                COUNT(id) as totalOrders
+            FROM orders
+        `);
+        const [[items]] = await db.query(`SELECT SUM(quantity) as totalItemsSold FROM order_items`);
+        return { ...sales, ...items };
+    },
+
+    /**
+     * (Admin) Gets the most recent orders from across the platform.
+     */
+    async getRecentPlatformOrders(limit = 5) {
+        const [orders] = await db.query(`
+            SELECT o.id, o.total_amount, o.created_at, u.first_name, u.last_name
+            FROM orders o
+            JOIN users u ON o.user_id = u.id
+            ORDER BY o.created_at DESC
+            LIMIT ?
+        `, [limit]);
+        return orders;
     }
 };
 

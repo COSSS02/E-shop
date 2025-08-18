@@ -428,6 +428,19 @@ const Product = {
         `;
         const [products] = await db.query(sql, [providerId, limit]);
         return products;
+    },
+
+    /**
+     * (Admin) Gets platform-wide product statistics.
+     */
+    async getPlatformStats() {
+        const [[stats]] = await db.query(`
+            SELECT
+                COUNT(*) as totalProducts,
+                SUM(CASE WHEN stock_quantity = 0 THEN 1 ELSE 0 END) as outOfStockCount
+            FROM products
+        `);
+        return stats;
     }
 };
 

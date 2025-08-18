@@ -6,6 +6,12 @@ const handleResponse = async (response) => {
     return data;
 };
 
+export const getAdminDashboard = async (token) => {
+    const response = await fetch('/api/dashboard/admin', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return handleResponse(response);
+};
 
 export const getProviderDashboard = async (token) => {
     const response = await fetch('/api/dashboard/provider', {

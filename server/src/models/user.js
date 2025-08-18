@@ -146,7 +146,33 @@ const User = {
     async deleteById(userId) {
         // Assumes ON DELETE CASCADE is set for related tables
         await db.query('DELETE FROM users WHERE id = ?', [userId]);
-    }
+    },
+
+    /**
+     * (Admin) Gets platform-wide user statistics.
+     */
+    async getPlatformStats() {
+        const [rows] = await db.query(`SELECT role, COUNT(*) as count FROM users GROUP BY role`);
+        const stats = rows.reduce((acc, row) => {
+            acc[`${row.role}s`] = row.count; // e.g., { clients: 10, providers: 5 }
+            return acc;
+        }, {});
+        const [[{ totalUsers }]] = await db.query(`SELECT COUNT(*) as totalUsers FROM users`);
+        return { ...stats, totalUsers };
+    },
+
+    /**
+     * (Admin) Gets the most recently registered users.
+     */
+    async getRecentUsers(limit = 5) {
+        const [users] = await db.query(`
+            SELECT id, first_name, last_name, email, role, created_at
+            FROM users
+            ORDER BY created_at DESC
+            LIMIT ?
+        `, [limit]);
+        return users;
+    },
 };
 
 module.exports = User;
