@@ -21,6 +21,14 @@ function SideMenu({ isOpen, closeMenu }) {
         closeMenu();
     };
 
+    const getIconUrl = (categoryName) => {
+        if (!categoryName) {
+            return '';
+        }
+        const iconName = categoryName.toLowerCase().replace(/ /g, '_') + '_icon.png';
+        return `/images/${iconName}`;
+    };
+
     return (
         <>
             {/* Overlay to dim the background */}
@@ -32,14 +40,21 @@ function SideMenu({ isOpen, closeMenu }) {
                     <button onClick={closeMenu} className="close-button">&times;</button>
                 </div>
                 <div className="side-menu-links">
-                    <Link to="/" onClick={handleLinkClick}>Home</Link>
+                    <Link to="/" onClick={handleLinkClick}>
+                        Home
+                        <img src={`/images/home.png`} alt={"Home"} className="sidemenu-icon" />
+                    </Link>
                     {user && (
-                        <Link to="/wishlist" onClick={handleLinkClick}>Wishlist</Link>
+                        <Link to="/wishlist" onClick={handleLinkClick}>
+                            Wishlist
+                            <img src={`/images/wishlist.png`} alt={"Wishlist"} className="sidemenu-icon" />
+                        </Link>
                     )}
                     {user && user.role === 'admin' && (
                         <>
                             <Link to="/admin/user-management" onClick={handleLinkClick} className="admin-link">
                                 User Management
+                                <img src={`/images/um.png`} alt={"User Management   "} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -47,6 +62,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/admin/address-management" onClick={handleLinkClick} className="admin-link">
                                 Address Management
+                                <img src={`/images/am.png`} alt={"Address Management"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -107,6 +123,7 @@ function SideMenu({ isOpen, closeMenu }) {
                             onClick={handleLinkClick}
                         >
                             {category.name}
+                            <img src={getIconUrl(category.name)} alt={category.name} className="sidemenu-icon" />
                         </Link>
                     ))}
                 </div>
