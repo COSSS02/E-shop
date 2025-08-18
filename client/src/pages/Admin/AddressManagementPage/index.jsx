@@ -11,8 +11,8 @@ function AdminAddressManagementPage() {
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [filterRole, setFilterRole] = useState('all');
-    const [filterType, setFilterType] = useState('all');
-    const [search, setSearch] = useState('');
+    const [searchTerm, setSearchTerm] = useState(''); // Debounced search term
+    const [inputValue, setInputValue] = useState(''); // Immediate input value
 
     const load = async () => {
         try {
@@ -27,6 +27,17 @@ function AdminAddressManagementPage() {
     };
 
     useEffect(() => { load(); }, [token]);
+
+    // Debouncing effect
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearchTerm(inputValue);
+        }, 500); // 500ms delay
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [inputValue]);
 
     const handleDelete = async (id) => {
         if (!window.confirm('Delete this address?')) return;
@@ -52,10 +63,9 @@ function AdminAddressManagementPage() {
 
     const filtered = addresses.filter(a => {
         const roleOk = filterRole === 'all' || a.role === filterRole;
-        const typeOk = filterType === 'all' || a.address_type === filterType;
-        const term = search.trim().toLowerCase();
-        const match = !term || [a.street, a.city, a.state, a.zip_code, a.country, a.email, a.first_name, a.last_name].some(v => (v || '').toLowerCase().includes(term));
-        return typeOk && roleOk && match;
+        const term = searchTerm.trim().toLowerCase();
+        const match = !term || [a.street, a.city, a.email, a.first_name, a.last_name].some(v => (v || '').toLowerCase().includes(term));
+        return roleOk && match;
     });
 
     if (loading) return <div className="admin-address-container"><p>Loading addresses...</p></div>;
@@ -68,20 +78,14 @@ function AdminAddressManagementPage() {
                 <input
                     type="text"
                     placeholder="Search (street, city, user, email)..."
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
+                    value={inputValue}
+                    onChange={e => setInputValue(e.target.value)}
                 />
                 <select value={filterRole} onChange={e => setFilterRole(e.target.value)}>
                     <option value="all">All Roles</option>
                     <option value="client">Clients</option>
                     <option value="provider">Providers</option>
                     <option value="admin">Admins</option>
-                </select>
-                <select value={filterType} onChange={e => setFilterType(e.target.value)}>
-                    <option value="all">All Types</option>
-                    <option value="shipping">Shipping</option>
-                    <option value="billing">Billing</option>
-                    <option value="provider">Provider</option>
                 </select>
             </div>
 
@@ -141,6 +145,7 @@ function AdminAddressManagementPage() {
     );
 }
 
+// The EditAddressModal component remains unchanged
 const EditAddressModal = ({ address, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         addressType: address.address_type,

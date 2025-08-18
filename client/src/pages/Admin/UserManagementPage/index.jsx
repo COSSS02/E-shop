@@ -9,15 +9,16 @@ function AdminUserManagementPage() {
     const [loading, setLoading] = useState(true);
     const [editingUser, setEditingUser] = useState(null);
     const [filterRole, setFilterRole] = useState('all');
-    const [search, setSearch] = useState('');
+    const [searchTerm, setSearchTerm] = useState(''); // Debounced search term
+    const [inputValue, setInputValue] = useState(''); // Immediate input value
     const { token } = useAuth();
     const { addToast } = useToast();
 
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            const data = await getAllUsers(token);
-            setUsers(data);
+            const data = await getAllUsers(token); // Fetches all users
+            setUsers(data.users || data); // Adjust based on what your API returns
         } catch (error) {
             addToast(error.message, "error");
         } finally {
@@ -29,23 +30,34 @@ function AdminUserManagementPage() {
         fetchUsers();
     }, [token]);
 
+    // Debouncing effect
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearchTerm(inputValue);
+        }, 500); // 500ms delay
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [inputValue]);
+
     const handleUpdate = async (updatedUserData) => {
         try {
             await updateUserAsAdmin(editingUser.id, updatedUserData, token);
             addToast("User updated successfully.", "success");
-            setEditingUser(null); // Close the modal
-            fetchUsers(); // Refresh the list
+            setEditingUser(null);
+            fetchUsers();
         } catch (error) {
             addToast(error.message, "error");
         }
     };
 
     const handleDelete = async (userId) => {
-        if (window.confirm("Are you sure you want to permanently delete this user? This action cannot be undone.")) {
+        if (window.confirm("Are you sure you want to permanently delete this user?")) {
             try {
                 await deleteUserAsAdmin(userId, token);
                 addToast("User deleted successfully.", "success");
-                fetchUsers(); // Refresh the user list
+                fetchUsers();
             } catch (error) {
                 addToast(error.message, "error");
             }
@@ -56,7 +68,7 @@ function AdminUserManagementPage() {
 
     const filteredUsers = users.filter(user => {
         const roleOk = filterRole === 'all' || user.role === filterRole;
-        const term = search.trim().toLowerCase();
+        const term = searchTerm.trim().toLowerCase();
         const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
         const match = !term ||
             fullName.includes(term) ||
@@ -72,8 +84,8 @@ function AdminUserManagementPage() {
                 <input
                     type="text"
                     placeholder="Search by name, email, company..."
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
+                    value={inputValue}
+                    onChange={e => setInputValue(e.target.value)}
                 />
                 <select value={filterRole} onChange={e => setFilterRole(e.target.value)}>
                     <option value="all">All Roles</option>
@@ -110,11 +122,6 @@ function AdminUserManagementPage() {
                                 </td>
                             </tr>
                         ))}
-                        {filteredUsers.length === 0 && (
-                            <tr>
-                                <td colSpan="7" style={{ textAlign: 'center', padding: '1rem' }}>No users match filters.</td>
-                            </tr>
-                        )}
                     </tbody>
                 </table>
             </div>
@@ -129,7 +136,7 @@ function AdminUserManagementPage() {
     );
 }
 
-// --- Modal Component for Editing Users ---
+// The EditUserModal component remains unchanged
 const EditUserModal = ({ user, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         firstName: user.first_name,
