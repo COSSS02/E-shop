@@ -1,5 +1,7 @@
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
+const https = require('https');
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/user');
 const dashboardRoutes = require('./src/routes/dashboard');
@@ -35,6 +37,11 @@ app.get("/*splat", (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+const options = {
+    key: fs.readFileSync(path.join(__dirname, './certs/key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, './certs/cert.pem'))
+};
+
+https.createServer(options, app).listen(port, () => {
+    console.log(`HTTPS server running on https://localhost:${port}`);
 });
