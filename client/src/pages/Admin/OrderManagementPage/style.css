@@ -74,7 +74,7 @@
     transition: box-shadow 0.2s;
 }
 
-.admin-order-card .order-summary-row:hover {
+.admin-order-card:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
