@@ -70,6 +70,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/admin/product-management" onClick={handleLinkClick} className="admin-link">
                                 Product Management
+                                <img src={`/images/product.png`} alt={"Product Management"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -77,6 +78,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/admin/order-management" onClick={handleLinkClick} className="admin-link">
                                 Order Management
+                                <img src={`/images/order.png`} alt={"Order Management"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -84,6 +86,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/admin/add-category" onClick={handleLinkClick} className="admin-link">
                                 Add Category
+                                <img src={`/images/add.png`} alt={"Add Category"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -91,6 +94,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/admin/dashboard" onClick={handleLinkClick} className="admin-link">
                                 Dashboard
+                                <img src={`/images/dashboard.png`} alt={"Dashboard"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -98,6 +102,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/provider/my-products" onClick={handleLinkClick} className="admin-link">
                                 My Products
+                                <img src={`/images/product.png`} alt={"My Products"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -105,6 +110,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/provider/add-product" onClick={handleLinkClick} className="admin-link">
                                 Add Product
+                                <img src={`/images/add.png`} alt={"Add Product"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -112,6 +118,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/provider/manage-orders" onClick={handleLinkClick} className="admin-link">
                                 Manage Orders
+                                <img src={`/images/order.png`} alt={"Manage Orders"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
@@ -119,6 +126,7 @@ function SideMenu({ isOpen, closeMenu }) {
                         <>
                             <Link to="/provider/dashboard" onClick={handleLinkClick} className="admin-link">
                                 Dashboard
+                                <img src={`/images/dashboard.png`} alt={"Dashboard"} className="sidemenu-icon" />
                             </Link>
                         </>
                     )}
