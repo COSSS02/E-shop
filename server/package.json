@@ -8,7 +8,7 @@
     "url": "git@github.com:COSSS02/E-shop.git"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "CLIENT_URL='https://localhost:3000' node server.js",
     "dev": "node --watch server.js",
     "build:client": "cd ../client && npm run build",
     "watch:client": "cd ../client && npm run build -- --watch",
@@ -20,8 +20,10 @@
     "bcrypt": "^6.0.0",
     "dotenv": "^17.1.0",
     "express": "^5.1.0",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.14.1"
+    "mysql2": "^3.14.1",
+    "stripe": "^18.4.0"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"

@@ -6,17 +6,17 @@ const handleResponse = async (response) => {
     return data;
 };
 
-export const placeOrder = async (addressIds, token) => {
-    const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(addressIds)
-    });
-    return handleResponse(response);
-};
+// export const placeOrder = async (addressIds, token) => {
+//     const response = await fetch('/api/orders', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${token}`
+//         },
+//         body: JSON.stringify(addressIds)
+//     });
+//     return handleResponse(response);
+// };
 
 export const getMyOrders = async (token) => {
     const response = await fetch('/api/orders/', {

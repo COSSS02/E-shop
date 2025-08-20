@@ -25,6 +25,16 @@ const User = {
     },
 
     /**
+     * Sets the Stripe Customer ID for a given user.
+     * @param {number} userId - The ID of the user in your database.
+     * @param {string} stripeCustomerId - The customer ID from Stripe.
+     */
+    async setStripeCustomerId(userId, stripeCustomerId) {
+        const sql = 'UPDATE users SET stripe_customer_id = ? WHERE id = ?';
+        await db.query(sql, [stripeCustomerId, userId]);
+    },
+
+    /**
      * Finds a user by their email address.
      * @param {string} email - The user's email.
      * @returns {Promise<object|null>} The user object or null if not found.

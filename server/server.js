@@ -12,9 +12,13 @@ const attributeRoutes = require('./src/routes/attribute');
 const cartRoutes = require('./src/routes/cart');
 const orderRoutes = require('./src/routes/orders');
 const wishlistRoutes = require('./src/routes/wishlist');
+const checkoutRoutes = require('./src/routes/checkout');
+const securityMiddleware = require('./src/middleware/security');
 
 const app = express();
 const port = 3000;
+
+app.use(securityMiddleware);
 
 app.use(express.json());
 
@@ -31,6 +35,7 @@ app.use('/api/attributes', attributeRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 app.get("/*splat", (req, res) => {
     console.log("Request received for:", req.url);

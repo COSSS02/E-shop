@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
 import { getCart, updateCartItem, removeFromCart } from '../../../api/cart';
-import { placeOrder } from '../../../api/orders';
 import { getMyAddresses } from '../../../api/address';
 import { useToast } from '../../../contexts/ToastContext';
+import { createCheckoutSession } from '../../../api/checkout';
+import { loadStripe } from '@stripe/stripe-js';
 import QuantitySelector from '../../../components/quantityselector/QuantitySelector';
 import { Link, useNavigate } from 'react-router-dom';
 import './style.css';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 function CartPage() {
     const [cartItems, setCartItems] = useState([]);
@@ -64,19 +67,34 @@ function CartPage() {
         }
     };
 
-    const handlePlaceOrder = async () => {
+    const handleProceedToPayment = async () => {
         const finalBillingId = useShippingForBilling ? shippingAddressId : billingAddressId;
         if (!shippingAddressId || !finalBillingId) {
             setError("Please select both a shipping and billing address.");
             return;
         }
+        setError(null); // Clear previous errors
+
         try {
-            const result = await placeOrder({ shippingAddressId, billingAddressId: finalBillingId }, token);
-            addToast(result.message, "success");
-            navigate('/'); // Redirect to homepage after successful order
-            await refreshCart();
+            // The backend needs to be updated to accept both address IDs.
+            // We will pass them in the body of the request.
+            const { id: sessionId } = await createCheckoutSession(token, {
+                shippingAddressId,
+                billingAddressId: finalBillingId
+            });
+
+            const stripe = await stripePromise;
+            const { error } = await stripe.redirectToCheckout({ sessionId });
+
+            // This part of the code will only be reached if there is an immediate error
+            // in the redirection process (e.g., network issue).
+            if (error) {
+                setError(error.message);
+                addToast(error.message, "error");
+            }
         } catch (err) {
             setError(err.message);
+            addToast(err.message, "error");
         }
     };
 
@@ -135,7 +153,9 @@ function CartPage() {
                                 Use shipping address for billing
                             </label>
                         </div>
-                        <button className="checkout-btn" onClick={handlePlaceOrder}>Place Order</button>
+                            <button className="checkout-btn" onClick={handleProceedToPayment}>
+                                Proceed to Payment
+                            </button>
                     </div>
                 </div>
             )}

@@ -8,6 +8,7 @@ import RegisterPage from './pages/Auth/RegisterPage';
 import ProfilePage from './pages/User/ProfilePage';
 import CartPage from './pages/User/CartPage';
 import WishlistPage from './pages/User/WishlistPage';
+import OrderSuccessPage from './pages/User/OrderSuccessPage';
 import MyProductsPage from './pages/Provider/MyProductsPage';
 import AddProductPage from './pages/Provider/AddProductPage';
 import EditProductPage from './pages/Provider/EditProductPage';
@@ -106,6 +107,11 @@ function App() {
             <Route path="/cart" element={
               <ProtectedRoute> {/* Protected for all logged-in users */}
                 <CartPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/order/success" element={
+              <ProtectedRoute> {/* Protected for all logged-in users */}
+                <OrderSuccessPage />
               </ProtectedRoute>
             } />
           </Routes>

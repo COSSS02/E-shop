@@ -2,27 +2,29 @@ const db = require('../config/db');
 const Cart = require('./cart');
 
 const Order = {
-    async createFromCart(userId, { shippingAddressId, billingAddressId }) {
+    async createFromCart(userId, { shippingAddressId, billingAddressId, totalAmount, stripeSessionId }) {
         const connection = await db.getConnection();
         try {
             await connection.beginTransaction();
 
             // 1. Get cart items and calculate total
             const cartItems = await Cart.getByUserId(userId);
+            console.log("Cart items:", cartItems);
             if (cartItems.length === 0) throw new Error("Cart is empty.");
 
-            let totalAmount = 0;
             for (const item of cartItems) {
                 if (item.quantity > item.stock_quantity) {
-                    throw new Error(`Not enough stock for ${item.name}. Available: ${item.stock_quantity}, Requested: ${item.quantity}.`);
+                    throw new Error(`Not enough stock for ${item.name}.`);
                 }
-                totalAmount += item.price * item.quantity;
             }
 
+            console.log("Creating order with items:", cartItems);
             // 2. Create the order
-            const orderSql = 'INSERT INTO orders (user_id, shipping_address_id, billing_address_id, total_amount) VALUES (?, ?, ?, ?)';
-            const [orderResult] = await connection.query(orderSql, [userId, shippingAddressId, billingAddressId, totalAmount]);
+            const orderSql = 'INSERT INTO orders (user_id, shipping_address_id, billing_address_id, total_amount, stripe_session_id) VALUES (?, ?, ?, ?, ?)';
+            const [orderResult] = await connection.query(orderSql, [userId, shippingAddressId, billingAddressId, totalAmount, stripeSessionId]);
             const orderId = orderResult.insertId;
+
+            console.log("Order created with ID:", orderId);
 
             // 3. Create order items and update product stock
             const orderItemSql = 'INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES ?';
