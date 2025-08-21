@@ -9,7 +9,6 @@ const Order = {
 
             // 1. Get cart items and calculate total
             const cartItems = await Cart.getByUserId(userId);
-            console.log("Cart items:", cartItems);
             if (cartItems.length === 0) throw new Error("Cart is empty.");
 
             for (const item of cartItems) {
@@ -18,13 +17,10 @@ const Order = {
                 }
             }
 
-            console.log("Creating order with items:", cartItems);
             // 2. Create the order
             const orderSql = 'INSERT INTO orders (user_id, shipping_address_id, billing_address_id, total_amount, stripe_session_id) VALUES (?, ?, ?, ?, ?)';
             const [orderResult] = await connection.query(orderSql, [userId, shippingAddressId, billingAddressId, totalAmount, stripeSessionId]);
             const orderId = orderResult.insertId;
-
-            console.log("Order created with ID:", orderId);
 
             // 3. Create order items and update product stock
             const orderItemSql = 'INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES ?';

@@ -3,6 +3,7 @@ const db = require('../config/db');
 const Cart = require('../models/cart');
 const User = require('../models/user');
 const Order = require('../models/orders');
+
 const checkoutController = {
     async createCheckoutSession(req, res) {
         try {
@@ -22,7 +23,10 @@ const checkoutController = {
             if (!stripeCustomerId) {
                 const customer = await stripe.customers.create({ email: req.user.email });
                 stripeCustomerId = customer.id;
+                console.log("Created new Stripe customer:", stripeCustomerId);
                 await User.setStripeCustomerId(userId, stripeCustomerId);
+            } else {
+                console.log("Using existing Stripe customer:", stripeCustomerId);
             }
 
             const line_items = cartItems.map(item => ({

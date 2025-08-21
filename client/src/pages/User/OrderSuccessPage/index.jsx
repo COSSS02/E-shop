@@ -36,7 +36,7 @@ function OrderSuccessPage() {
                 const result = await fulfillOrder(sessionId, token);
                 setOrderId(result.orderId);
                 setStatus('success');
-                await refreshCart(); // This will trigger a re-render, but the check above will prevent a second call.
+                await refreshCart();
             } catch (err) {
                 setStatus('error');
                 setError(err.message || 'An unknown error occurred during order fulfillment.');
@@ -45,7 +45,7 @@ function OrderSuccessPage() {
 
         verifyPayment();
 
-    }, [searchParams, token, refreshCart]); // Dependencies are still important for the initial run.
+    }, [searchParams, token, refreshCart]); 
 
     return (
         <div className="order-status-container">
