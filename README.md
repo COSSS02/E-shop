@@ -25,3 +25,9 @@ docker run --name e-shop-client --rm -it -p 5173:5173 \
 -v "$(pwd)/certs:/app/certs:ro" -v "$(pwd):/app" \
 -v /app/node_modules -e CHOKIDAR_USEPOLLING=1 e-shop-client:dev
 ```
+
+### Docker Compose
+```bash
+docker-compose up --build
+docker-compose down
+```

@@ -14,7 +14,7 @@ export default defineConfig({
     proxy: {
       // Proxy requests from /api to your Express server
       '/api': {
-        target: 'https://host.docker.internal:3000',
+        target: 'https://server:3000',
         changeOrigin: true, // Recommended for virtual hosts
         secure: false,
         ws: true,
@@ -31,7 +31,7 @@ export default defineConfig({
         // }
       },
       '/images': {
-        target: 'https://host.docker.internal:3000',
+        target: 'https://server:3000',
         changeOrigin: true,
         secure: false,
       }
