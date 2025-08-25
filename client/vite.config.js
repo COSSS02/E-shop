@@ -8,13 +8,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     https: {
-      key: fs.readFileSync(path.resolve(__dirname, '../server/certs/key.pem')),
-      cert: fs.readFileSync(path.resolve(__dirname, '../server/certs/cert.pem'))
+      key: fs.readFileSync(path.resolve(__dirname, './certs/key.pem')),
+      cert: fs.readFileSync(path.resolve(__dirname, './certs/cert.pem'))
     },
     proxy: {
       // Proxy requests from /api to your Express server
       '/api': {
-        target: 'https://localhost:3000',
+        target: 'https://host.docker.internal:3000',
         changeOrigin: true, // Recommended for virtual hosts
         secure: false,
         ws: true,
@@ -31,7 +31,7 @@ export default defineConfig({
         // }
       },
       '/images': {
-        target: 'https://localhost:3000',
+        target: 'https://host.docker.internal:3000',
         changeOrigin: true,
         secure: false,
       }
