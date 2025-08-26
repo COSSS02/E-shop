@@ -11,6 +11,7 @@ function AdminAddressManagementPage() {
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [filterRole, setFilterRole] = useState('all');
+    const [filterType, setFilterType] = useState('all');
     const [searchTerm, setSearchTerm] = useState(''); // Debounced search term
     const [inputValue, setInputValue] = useState(''); // Immediate input value
 
@@ -63,9 +64,10 @@ function AdminAddressManagementPage() {
 
     const filtered = addresses.filter(a => {
         const roleOk = filterRole === 'all' || a.role === filterRole;
+        const typeOk = filterType === 'all' || a.address_type === filterType;
         const term = searchTerm.trim().toLowerCase();
         const match = !term || [a.street, a.city, a.email, a.first_name, a.last_name].some(v => (v || '').toLowerCase().includes(term));
-        return roleOk && match;
+        return typeOk && roleOk && match;
     });
 
     if (loading) return <div className="admin-address-container"><p>Loading addresses...</p></div>;
@@ -86,6 +88,12 @@ function AdminAddressManagementPage() {
                     <option value="client">Clients</option>
                     <option value="provider">Providers</option>
                     <option value="admin">Admins</option>
+                </select>
+                <select value={filterType} onChange={e => setFilterType(e.target.value)}>
+                    <option value="all">All Types</option>
+                    <option value="shipping">Shipping</option>
+                    <option value="billing">Billing</option>
+                    <option value="provider">Provider</option>
                 </select>
             </div>
 
