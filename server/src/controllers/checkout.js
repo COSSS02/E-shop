@@ -19,12 +19,12 @@ const checkoutController = {
                 return res.status(400).json({ message: "Your cart is empty." });
             }
 
-            let stripeCustomerId = req.user.stripeCustomerId;
+            let stripeCustomerId = await User.getStripeCustomerId(userId);
             if (!stripeCustomerId) {
                 const customer = await stripe.customers.create({ email: req.user.email });
                 stripeCustomerId = customer.id;
-                console.log("Created new Stripe customer:", stripeCustomerId);
                 await User.setStripeCustomerId(userId, stripeCustomerId);
+                console.log("Created new Stripe customer:", stripeCustomerId);
             } else {
                 console.log("Using existing Stripe customer:", stripeCustomerId);
             }

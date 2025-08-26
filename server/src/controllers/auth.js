@@ -57,8 +57,7 @@ const authController = {
                 firstName: user.first_name,
                 lastName: user.last_name,
                 role: user.role,
-                companyName: user.company_name,
-                stripeCustomerId: user.stripe_customer_id
+                companyName: user.company_name
             };
 
             const token = jwt.sign(

@@ -24,6 +24,15 @@ const User = {
         return result;
     },
 
+    async getStripeCustomerId(userId) {
+        const sql = 'SELECT stripe_customer_id FROM users WHERE id = ?';
+        const [rows] = await db.query(sql, [userId]);
+        if (rows.length === 0) {
+            return null;
+        }
+        return rows[0].stripe_customer_id;
+    },
+
     /**
      * Sets the Stripe Customer ID for a given user.
      * @param {number} userId - The ID of the user in your database.
