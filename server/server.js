@@ -22,7 +22,7 @@ app.use(securityMiddleware);
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, 'client/dist')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/auth', authRoutes);
@@ -39,7 +39,7 @@ app.use('/api/checkout', checkoutRoutes);
 
 app.get("/*splat", (req, res) => {
     console.log("Request received for:", req.url);
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
 const options = {

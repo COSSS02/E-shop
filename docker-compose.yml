@@ -1,19 +1,22 @@
 version: '3.8'
 
 services:
-  # The Backend Server Service
+  # The single production service
   server:
     build:
-      context: ./server
-      dockerfile: Dockerfile
-    container_name: e-shop-server
+      # The context is the project root so the Dockerfile can access ./client
+      context: .
+      dockerfile: ./server/Dockerfile
+      # Target the final 'runner' stage for a lean production image
+      target: runner
+    container_name: e-shop-server-prod
+    restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
       - ./server/.env
+    # Mount certificates read-only.
     volumes:
-      - ./server:/app
-      - /app/node_modules
       - ./server/certs:/app/certs:ro
     # This allows the container to connect to your local MariaDB on the host
     extra_hosts:
@@ -21,28 +24,7 @@ services:
     networks:
       - e-shop-net
 
-  # The Frontend Client Service
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    container_name: e-shop-client
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./client:/app
-      - /app/node_modules
-      - ./client/certs:/app/certs:ro
-    environment:
-      # Ensures hot-reloading works reliably inside the container
-      - CHOKIDAR_USEPOLLING=1
-    networks:
-      - e-shop-net
-    # This ensures the server starts before the client
-    depends_on:
-      - server
-
-# Define the network that allows containers to communicate by name
+# Define the network
 networks:
   e-shop-net:
     driver: bridge
