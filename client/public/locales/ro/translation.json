@@ -1,0 +1,15 @@
+{
+    "login": "Autentificare",
+    "register": "Înregistrare",
+    "search": "Caută",
+    "search_placeholder": "Caută un produs...",
+    "profile": "Profil",
+    "cart": "Coș",
+    "logout": "Deconectare",
+    "welcome_message": "Bun venit la E-Shop",
+    "shop_by_category": "Cumpărături pe Categorii",
+    "sort_by": "Sortează după:",
+    "newest": "Cele mai noi",
+    "price_low_high": "Preț: Mic la Mare",
+    "my_wishlist": "Lista de dorințe"
+}

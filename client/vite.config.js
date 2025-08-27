@@ -35,6 +35,10 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       }
-    }
+    },
+    watch: {
+      // Watch for changes in the translation files and reload the page
+      paths: ['public/locales/**/*.json'],
+    },
   }
 })

@@ -148,3 +148,29 @@
 .logout-button:hover {
     background-color: #2c2c2c;
 }
+
+.language-switcher {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.language-switcher button {
+    padding: 0.3rem 0.6rem;
+    border: 2px solid rgb(255, 63, 98);
+    border-radius: 4px;
+    background-color: #522546;
+    color: rgb(220, 220, 220);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.language-switcher button:hover {
+    background-color: #451535;
+}
+
+.language-switcher button:enabled {
+    border: 1px solid transparent;
+    cursor: default;
+}

@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/General/HomePage';
 import CategoryPage from './pages/General/CategoryPage';
@@ -27,6 +28,7 @@ import './App.css'
 
 function App() {
   return (
+    <Suspense fallback="Loading...">
     <Router>
       <ToastProvider>
         <Layout>
@@ -117,7 +119,8 @@ function App() {
           </Routes>
         </Layout>
       </ToastProvider>
-    </Router>
+      </Router>
+    </Suspense>
   );
 }
 

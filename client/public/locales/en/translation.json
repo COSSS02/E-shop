@@ -1,0 +1,15 @@
+{
+    "login": "Login",
+    "register": "Register",
+    "search": "Search",
+    "search_placeholder": "Search for products...",
+    "profile": "Profile",
+    "cart": "Cart",
+    "logout": "Logout",
+    "welcome_message": "Welcome to the E-Shop",
+    "shop_by_category": "Shop by Category",
+    "sort_by": "Sort by:",
+    "newest": "Newest",
+    "price_low_high": "Price: Low to High",
+    "my_wishlist": "My Wishlist"
+}

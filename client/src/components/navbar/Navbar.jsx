@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import Logo from '../../assets/logo.svg';
@@ -8,11 +9,16 @@ import SideMenu from '../sidemenu/SideMenu';
 import './Navbar.css';
 
 function Navbar() {
+    const { t, i18n } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const { user, logout } = useAuth();
     const { cartItemCount } = useCart();
     const navigate = useNavigate();
+
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+    };
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -41,26 +47,30 @@ function Navbar() {
                     <input
                         type="text"
                         className="search-input"
-                        placeholder="Search for products..."
+                        placeholder={t('search_placeholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <button type="submit" className="search-button">Search</button>
+                    <button type="submit" className="search-button">{t('search')}</button>
                 </form>
 
                 <div className="nav-links">
+                    <div className="language-switcher">
+                        <button onClick={() => changeLanguage('en')} disabled={i18n.language === 'en'}>EN</button>
+                        <button onClick={() => changeLanguage('ro')} disabled={i18n.language === 'ro'}>RO</button>
+                    </div>
                     {user ? (
                         <>
-                            <Link to="/profile" className="nav-button">Profile</Link>
-                            <Link to="/cart" className="nav-cart-link nav-button">Cart
+                            <Link to="/profile" className="nav-button">{t('profile')}</Link>
+                            <Link to="/cart" className="nav-cart-link nav-button">{t('cart')}
                                 {cartItemCount > 0 && <span className="cart-badge">{cartItemCount}</span>}
                             </Link>
-                            <button onClick={logout} className="nav-button logout-button">Logout</button>
+                            <button onClick={logout} className="nav-button logout-button">{t('logout')}</button>
                         </>
                     ) : (
                         <>
-                            <Link to="/login" className="nav-button">Login</Link>
-                            <Link to="/register" className="nav-button">Register</Link>
+                            <Link to="/login" className="nav-button">{t('login')}</Link>
+                            <Link to="/register" className="nav-button">{t('register')}</Link>
                         </>
                     )}
                 </div>
