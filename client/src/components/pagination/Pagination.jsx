@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import {useTranslation} from "react-i18next";
 import './Pagination.css';
 
 function Pagination({ currentPage, totalPages, onPageChange }) {
+    const { t } = useTranslation();
     const [inputValue, setInputValue] = useState(currentPage);
 
     // When the currentPage prop changes (e.g., from the URL),
@@ -33,11 +35,11 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
     return (
         <div className="pagination-controls">
             <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
-                &laquo; Previous
+                &laquo; {t('previous')}
             </button>
 
             <form onSubmit={handleFormSubmit} className="pagination-form">
-                <span>Page</span>
+                <span>{t('page')}</span>
                 <input
                     type="number"
                     value={inputValue}
@@ -47,11 +49,11 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
                     min="1"
                     max={totalPages}
                 />
-                <span>of {totalPages}</span>
+                <span>{t('of')} {totalPages}</span>
             </form>
 
             <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                Next &raquo;
+                {t('next')} &raquo;
             </button>
         </div>
     );

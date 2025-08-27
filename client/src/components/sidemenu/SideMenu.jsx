@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import {useTranslation} from "react-i18next";
 import { Link } from 'react-router-dom';
 import { getAllCategories } from '../../api/categories';
 import { useAuth } from '../../contexts/AuthContext';
 import './SideMenu.css';
 
 function SideMenu({ isOpen, closeMenu }) {
+    const { t } = useTranslation();
     const [categories, setCategories] = useState([]);
     const { user } = useAuth();
 
@@ -21,11 +23,15 @@ function SideMenu({ isOpen, closeMenu }) {
         closeMenu();
     };
 
+    const transformCategoryName = (categoryName) => {
+        return categoryName.toLowerCase().replace(/ /g, '_');
+    }
+
     const getIconUrl = (categoryName) => {
         if (!categoryName) {
             return '';
         }
-        const iconName = categoryName.toLowerCase().replace(/ /g, '_') + '_icon.png';
+        const iconName = transformCategoryName(categoryName) + '_icon.png';
         return `/images/${iconName}`;
     };
 
@@ -36,24 +42,24 @@ function SideMenu({ isOpen, closeMenu }) {
 
             <div className={`side-menu ${isOpen ? 'open' : ''}`}>
                 <div className="side-menu-header">
-                    <h3>Menu</h3>
+                    <h3>{t('menu')}</h3>
                     <button onClick={closeMenu} className="close-button">&times;</button>
                 </div>
                 <div className="side-menu-links">
                     <Link to="/" onClick={handleLinkClick}>
-                        Home
+                        {t('home')}
                         <img src={`/images/home.png`} alt={"Home"} className="sidemenu-icon" />
                     </Link>
                     {user && (
                         <Link to="/wishlist" onClick={handleLinkClick}>
-                            Wishlist
+                            {t('wishlist')}
                             <img src={`/images/wishlist.png`} alt={"Wishlist"} className="sidemenu-icon" />
                         </Link>
                     )}
                     {user && user.role === 'admin' && (
                         <>
                             <Link to="/admin/user-management" onClick={handleLinkClick} className="admin-link">
-                                User Management
+                                {t('user_management')}
                                 <img src={`/images/um.png`} alt={"User Management   "} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -61,7 +67,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'admin' && (
                         <>
                             <Link to="/admin/address-management" onClick={handleLinkClick} className="admin-link">
-                                Address Management
+                                {t('address_management')}
                                 <img src={`/images/am.png`} alt={"Address Management"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -69,7 +75,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'admin' && (
                         <>
                             <Link to="/admin/product-management" onClick={handleLinkClick} className="admin-link">
-                                Product Management
+                                {t('product_management')}
                                 <img src={`/images/product.png`} alt={"Product Management"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -77,7 +83,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'admin' && (
                         <>
                             <Link to="/admin/order-management" onClick={handleLinkClick} className="admin-link">
-                                Order Management
+                                {t('order_management')}
                                 <img src={`/images/order.png`} alt={"Order Management"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -85,7 +91,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'admin' && (
                         <>
                             <Link to="/admin/add-category" onClick={handleLinkClick} className="admin-link">
-                                Add Category
+                                {t('add_category')}
                                 <img src={`/images/add.png`} alt={"Add Category"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -93,7 +99,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'admin' && (
                         <>
                             <Link to="/admin/dashboard" onClick={handleLinkClick} className="admin-link">
-                                Dashboard
+                                {t('dashboard')}
                                 <img src={`/images/dashboard.png`} alt={"Dashboard"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -101,7 +107,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'provider' && (
                         <>
                             <Link to="/provider/my-products" onClick={handleLinkClick} className="admin-link">
-                                My Products
+                                {t('my_products')}
                                 <img src={`/images/product.png`} alt={"My Products"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -109,7 +115,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'provider' && (
                         <>
                             <Link to="/provider/add-product" onClick={handleLinkClick} className="admin-link">
-                                Add Product
+                                {t('add_product')}
                                 <img src={`/images/add.png`} alt={"Add Product"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -117,7 +123,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'provider' && (
                         <>
                             <Link to="/provider/manage-orders" onClick={handleLinkClick} className="admin-link">
-                                Manage Orders
+                                {t('manage_orders')}
                                 <img src={`/images/order.png`} alt={"Manage Orders"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -125,7 +131,7 @@ function SideMenu({ isOpen, closeMenu }) {
                     {user && user.role === 'provider' && (
                         <>
                             <Link to="/provider/dashboard" onClick={handleLinkClick} className="admin-link">
-                                Dashboard
+                                {t('dashboard')}
                                 <img src={`/images/dashboard.png`} alt={"Dashboard"} className="sidemenu-icon" />
                             </Link>
                         </>
@@ -137,7 +143,7 @@ function SideMenu({ isOpen, closeMenu }) {
                             to={`/categories/${encodeURIComponent(category.name)}`}
                             onClick={handleLinkClick}
                         >
-                            {category.name}
+                            {t(transformCategoryName(category.name))}
                             <img src={getIconUrl(category.name)} alt={category.name} className="sidemenu-icon" />
                         </Link>
                     ))}

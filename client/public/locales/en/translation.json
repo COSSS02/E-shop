@@ -6,10 +6,40 @@
     "profile": "Profile",
     "cart": "Cart",
     "logout": "Logout",
-    "welcome_message": "Welcome to the E-Shop",
-    "shop_by_category": "Shop by Category",
+
     "sort_by": "Sort by:",
     "newest": "Newest",
+    "alphabetical": "Alphabetical (A-Z)",
     "price_low_high": "Price: Low to High",
-    "my_wishlist": "My Wishlist"
+    "price_high_low": "Price: High to Low",
+    "stock_low_high": "Stock: Low to High",
+    "stock_high_low": "Stock: High to Low",
+
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+
+    "menu": "Menu",
+    "home": "Home",
+    "wishlist": "Wishlist",
+    "user_management": "User Management",
+    "address_management": "Address Management",
+    "product_management": "Product Management",
+    "order_management": "Order Management",
+    "add_category": "Add Category",
+    "dashboard": "Dashboard",
+    "my_products": "My Products",
+    "add_product": "Add Product",
+    "manage_orders": "Manage Orders",
+
+    "cpu": "CPU",
+    "cpu_cooler": "CPU Cooler",
+    "gpu": "GPU",
+    "motherboard": "Motherboard",
+    "pc_case": "PC Case",
+    "pc_fans": "PC Fans",
+    "psu": "PSU",
+    "ram": "RAM Memory",
+    "storage": "Storage"
 }
