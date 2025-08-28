@@ -23,12 +23,13 @@ import OrderManagementPage from './pages/Admin/OrderManagementPage';
 import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 import { ToastProvider } from './contexts/ToastContext';
 import Layout from './components/layout/Layout';
+import LoadingSpinner from './components/loadingspinner/LoadingSpinner';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './App.css'
 
 function App() {
   return (
-    <Suspense fallback="Loading...">
+    <Suspense fallback={<LoadingSpinner />}>
     <Router>
       <ToastProvider>
         <Layout>
