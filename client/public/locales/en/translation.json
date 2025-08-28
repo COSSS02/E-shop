@@ -1,5 +1,5 @@
 {
-    "login": "Login",
+    "login": "Log In",
     "register": "Register",
     "search": "Search",
     "search_placeholder": "Search for products...",
@@ -41,5 +41,16 @@
     "pc_fans": "PC Fans",
     "psu": "PSU",
     "ram": "RAM Memory",
-    "storage": "Storage"
+    "storage": "Storage",
+
+    "login_page": "Log In to Your Account",
+    "email": "Email",
+    "password": "Password",
+    "dont_have_account": "Don't have an account? ",
+    "register_here": "Register here",
+    "create_account": "Create an Account",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "have_account": "Already have an account? ",
+    "login_here": "Log in here"
 }

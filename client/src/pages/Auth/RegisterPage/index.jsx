@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../../../api/auth';
 import Logo from '../../../assets/logo.svg';
 import './style.css';
 
 function RegisterPage() {
+    const { t, i18n } = useTranslation();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -35,6 +37,10 @@ function RegisterPage() {
         }
     };
 
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+    };
+
     return (
         <div className="register-container">
             <div className="auth-header">
@@ -44,30 +50,34 @@ function RegisterPage() {
                 </Link>
             </div>
             <form className="register-form" onSubmit={handleSubmit}>
-                <h2>Create an Account</h2>
+                <h2>{t('create_account')}</h2>
                 {error && <p className="error-message">{error}</p>}
                 <div className="form-group">
-                    <label htmlFor="firstName">First Name</label>
+                    <label htmlFor="firstName">{t('first_name')}</label>
                     <input type="text" id="firstName" name="firstName" onChange={handleChange} required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="lastName">Last Name</label>
+                    <label htmlFor="lastName">{t('last_name')}</label>
                     <input type="text" id="lastName" name="lastName" onChange={handleChange} required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">{t('email')}</label>
                     <input type="email" id="email" name="email" onChange={handleChange} required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password">Password</label>
+                    <label htmlFor="password">{t('password')}</label>
                     <input type="password" id="password" name="password" onChange={handleChange} required />
                 </div>
                 <button type="submit" className="register-button" disabled={loading}>
-                    {loading ? 'Registering...' : 'Register'}
+                    {loading ? 'Registering...' : t('register')}
                 </button>
                 <p className="login-link">
-                    Already have an account? <Link to="/login">Log in here</Link>
+                    {t('have_account')} <Link to="/login">{t('login_here')}</Link>
                 </p>
+                <div className="register-language-switcher">
+                    <button onClick={() => changeLanguage('en')} disabled={i18n.language === 'en'}>EN</button>
+                    <button onClick={() => changeLanguage('ro')} disabled={i18n.language === 'ro'}>RO</button>
+                </div>
             </form>
         </div>
     );

@@ -35,7 +35,7 @@ main:has(.register-container) {
 .register-form {
     width: 100%;
     max-width: 420px;
-    padding: 1.5rem;
+    padding: 1rem 1.5rem;
     background-color: #3a3a3a;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -86,4 +86,32 @@ main:has(.register-container) {
     border-radius: 4px;
     margin-bottom: 1rem;
     text-align: center;
+}
+
+.register-language-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.register-language-switcher button {
+    padding: 0.3rem 0.6rem;
+    border: 2px solid rgb(255, 63, 98);
+    border-radius: 4px;
+    background-color: #522546;
+    color: rgb(220, 220, 220);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.register-language-switcher button:hover {
+    background-color: #451535;
+}
+
+.register-language-switcher button:enabled {
+    border: 1px solid transparent;
+    cursor: default;
 }

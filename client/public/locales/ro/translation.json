@@ -41,5 +41,16 @@
     "pc_fans": "Ventilatoare PC",
     "psu": "Sursă Alimentare",
     "ram": "Memorie RAM",
-    "storage": "Stocare"
+    "storage": "Stocare",
+
+    "login_page": "Autentifică-te în Contul Tău",
+    "email": "Adresă de Mail",
+    "password": "Parolă",
+    "dont_have_account": "Nu ai un cont? ",
+    "register_here": "Înregistrează-te aici",
+    "create_account": "Creează-ți un Cont",
+    "first_name": "Prenume",
+    "last_name": "Nume",
+    "have_account": "Deja ai un cont? ",
+    "login_here": "Autentifică-te aici"
 }
