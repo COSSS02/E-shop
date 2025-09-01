@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { getProductById, updateProduct } from '../../../api/products';
@@ -8,6 +9,7 @@ import { getAttributesByCategoryId } from '../../../api/attributes';
 import '../AddProductPage/style.css';
 
 function EditProductPage() {
+    const { t } = useTranslation();
     const { productId } = useParams();
     const navigate = useNavigate();
     const { user, token } = useAuth();
@@ -115,7 +117,7 @@ function EditProductPage() {
     return (
         <div className="add-product-container">
             <form className="add-product-form" onSubmit={handleSubmit}>
-                <h2>Edit Product</h2>
+                <h2>{t('edit_product')}</h2>
                 {error && <p className="error-message">{error}</p>}
                 {success && <p className="success-message">{success}</p>}
 
@@ -123,46 +125,47 @@ function EditProductPage() {
                 {!error && (
                     <>
                         <fieldset>
-                            <legend>Core Information</legend>
+                            <legend>{t('core_info')}</legend>
                             <div className="form-group">
-                                <label htmlFor="name">Product Name</label>
+                                <label htmlFor="name">{t('product_name')}</label>
                                 <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="category">Category</label>
+                                <label htmlFor="category">{t('category')}</label>
                                 <select id="category" value={categoryId} onChange={e => setCategoryId(e.target.value)} required>
-                                    <option value="">-- Select a Category --</option>
+                                    <option value="">-- {t('select_category')} --</option>
                                     {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                                 </select>
                             </div>
                             <div className="form-group-row">
                                 <div className="form-group">
-                                    <label htmlFor="price">Price ($)</label>
+                                    <label htmlFor="price">{t('price')} ($)</label>
                                     <input type="number" id="price" value={price} onChange={e => setPrice(e.target.value)} required min="0.01" step="0.01" />
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="stock_quantity">Stock Quantity</label>
+                                    <label htmlFor="stock_quantity">{t('quantity')}</label>
                                     <input type="number" id="stock_quantity" value={stockQuantity} onChange={e => setStockQuantity(e.target.value)} required min="0" step="1" />
                                 </div>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="description">Description (Optional)</label>
+                                <label htmlFor="description">{t('description')} ({t('optional')})</label>
                                 <textarea id="description" rows="4" value={description} onChange={e => setDescription(e.target.value)}></textarea>
                             </div>
                         </fieldset>
 
                         <fieldset>
-                            <legend>Product Specifications</legend>
+                            <legend>{t('specifications')}</legend>
                             {attributes.map((attr, index) => (
                                 <div key={index} className="attribute-row">
                                     <input
                                         type="text"
                                         name="attributeName"
-                                        placeholder="Attribute (e.g., Color)"
+                                        placeholder={t('attribute')}
                                         value={attr.attributeName}
                                         onChange={e => handleAttributeChange(index, e)}
                                         list="attribute-suggestions"
-                                        autoComplete="off"
+                                        disabled={!categoryId}
+                                        autoComplete='off'
                                     />
                                     <datalist id="attribute-suggestions">
                                         {categoryAttributes.map(catAttr => <option key={catAttr.id} value={catAttr.name} />)}
@@ -170,18 +173,21 @@ function EditProductPage() {
                                     <input
                                         type="text"
                                         name="value"
-                                        placeholder="Value (e.g., Red)"
+                                        placeholder={t('value')}
                                         value={attr.value}
                                         onChange={e => handleAttributeChange(index, e)}
+                                        disabled={!categoryId}
                                     />
                                     <button type="button" className="remove-btn" onClick={() => removeAttribute(index)}>&times;</button>
                                 </div>
                             ))}
-                            <button type="button" className="add-btn" onClick={addAttribute}>+ Add Specification</button>
+                            <button type="button" className="add-btn" onClick={addAttribute} disabled={!categoryId}>
+                                + {t('add_specification')}
+                            </button>
                         </fieldset>
 
                         <button type="submit" className="submit-button" disabled={loading}>
-                            {loading ? 'Saving...' : 'Save Changes'}
+                            {loading ? 'Saving...' : t('save_changes')}
                         </button>
                     </>
                 )}

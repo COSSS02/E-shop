@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { useAuth } from '../../../contexts/AuthContext';
 import { getProviderOrderItems, updateOrderItemStatus } from '../../../api/orders';
 import { useToast } from '../../../contexts/ToastContext';
@@ -6,6 +7,7 @@ import { Link } from 'react-router-dom';
 import './style.css';
 
 function ManageOrdersPage() {
+    const { t } = useTranslation();
     const [orderItems, setOrderItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -43,17 +45,17 @@ function ManageOrdersPage() {
 
     return (
         <div className="manage-orders-container">
-            <h1>Manage Incoming Orders</h1>
+            <h1>{t('manage_orders')}</h1>
             {loading && <p>Loading orders...</p>}
             {error && <p className="error-message">{error}</p>}
             {!loading && !error && (
                 <div className="order-items-table">
                     <div className="table-header">
-                        <span>Order ID</span>
-                        <span>Product</span>
-                        <span>Customer</span>
-                        <span>Shipping Address</span>
-                        <span>Status</span>
+                        <span>{t('ord_id')}</span>
+                        <span>{t('product')}</span>
+                        <span>{t('customer')}</span>
+                        <span>{t('shipping')}</span>
+                        <span>{t('status')}</span>
                     </div>
                     {orderItems.length > 0 ? (
                         orderItems.map(item => (
@@ -61,7 +63,7 @@ function ManageOrdersPage() {
                                 <span className="cell-order-id">#{item.order_id}</span>
                                 <div className="cell-product">
                                     <Link to={`/products/${item.product_id}`} className="item-name"><strong>{item.product_name}</strong></Link>
-                                    <span>Qty: {item.quantity}</span>
+                                    <span>{t('qty')}: {item.quantity}</span>
                                 </div>
                                 <span className="cell-customer">{item.first_name} {item.last_name}</span>
                                 <div className="cell-address">
@@ -73,13 +75,13 @@ function ManageOrdersPage() {
                                         onChange={(e) => handleStatusChange(item.order_item_id, e.target.value)}
                                         className={`status-select status-${item.status.toLowerCase()}`}
                                     >
-                                        {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                        {statusOptions.map(opt => <option key={opt} value={opt}>{t(opt)}</option>)}
                                     </select>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <p>You have no incoming orders.</p>
+                        <p>{t('no_incoming_orders')}</p>
                     )}
                 </div>
             )}

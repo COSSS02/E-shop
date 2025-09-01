@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { getProviderDashboard } from '../../../api/dashboard';
 import './style.css';
 
 function DashboardPage() {
+    const { t } = useTranslation();
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -34,30 +36,30 @@ function DashboardPage() {
 
     return (
         <div className="dashboard-container">
-            <h1>Provider Dashboard</h1>
+            <h1>{t('provider')} - {t('dashboard')}</h1>
             <div className="dashboard-grid">
-                <StatCard title="Total Revenue" value={`$${Number(salesStats.totalRevenue).toFixed(2)}`} />
-                <StatCard title="Total Orders" value={salesStats.totalOrders} />
-                <StatCard title="Items Sold" value={salesStats.totalItemsSold} />
+                <StatCard title={t('total_revenue')} value={`$${Number(salesStats.totalRevenue).toFixed(2)}`} />
+                <StatCard title={t('total_orders')} value={salesStats.totalOrders} />
+                <StatCard title={t('items_sold')} value={salesStats.totalItemsSold} />
 
-                <DashboardListCard title="Low Stock Alerts" data={lowStockProducts} renderItem={item => (
+                <DashboardListCard title={t('low_stock_alerts')} data={lowStockProducts} renderItem={item => (
                     <Link to={`/provider/edit-product/${item.id}`}>
-                        {item.name} <span>Stock: {item.stock_quantity}</span>
+                        {item.name} <span>{t('stock')}: {item.stock_quantity}</span>
                     </Link>
-                )} emptyMessage="No products are low on stock." />
+                )} emptyMessage={t('no_low_products')} />
 
-                <DashboardListCard title="Top Selling Products" data={topSellers} renderItem={item => (
+                <DashboardListCard title={t('top_selling_products')} data={topSellers} renderItem={item => (
                     <Link to={`/products/${item.id}`}>
-                        {item.name} <span>Sold: {item.total_sold}</span>
+                        {item.name} <span>{t('sold')}: {item.total_sold}</span>
                     </Link>
-                )} emptyMessage="No sales data yet." />
+                )} emptyMessage={t('no_sales_data')} />
 
-                <DashboardListCard title="Recent Orders" data={recentOrders} renderItem={item => (
+                <DashboardListCard title={t('recent_orders')} data={recentOrders} renderItem={item => (
                     <Link to="/provider/manage-orders">
-                        Order #{item.order_id} - ${Number(item.order_total).toFixed(2)}
+                        {t('order')} #{item.order_id} - ${Number(item.order_total).toFixed(2)}
                         <small>{item.product_names}</small>
                     </Link>
-                )} emptyMessage="No recent orders." />
+                )} emptyMessage={t('no_recent_orders')} />
             </div>
         </div>
     );

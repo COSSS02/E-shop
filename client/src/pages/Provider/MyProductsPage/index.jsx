@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { getProviderProducts } from '../../../api/products';
@@ -8,6 +9,7 @@ import SortControl from '../../../components/sortcontrol/SortControl';
 import './style.css';
 
 function MyProductsPage() {
+    const { t } = useTranslation();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -59,7 +61,7 @@ function MyProductsPage() {
     return (
         <div className="my-products-container">
             <div className="my-products-header">
-                <h1>My Products</h1>
+                <h1>{t('my_products')}</h1>
                 <SortControl currentSort={currentSort} onSortChange={handleSortChange} />
             </div>
 
@@ -69,7 +71,7 @@ function MyProductsPage() {
                 <>
                     {products.length > 0
                         ? <ProductList products={products} />
-                        : <p>You have not added any products yet.</p>
+                        : <p>{t('no_products_added')}</p>
                     }
                     {pagination && pagination.totalPages > 1 && (
                         <Pagination
