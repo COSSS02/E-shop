@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { getAllProducts } from '../../../api/products';
 import ProductList from '../../../components/products/ProductList';
@@ -7,6 +8,7 @@ import SortControl from '../../../components/sortcontrol/SortControl';
 import './style.css';
 
 function HomePage() {
+    const { t } = useTranslation();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -52,10 +54,9 @@ function HomePage() {
     return (
         <div>
             <div className="home-header">
-                <h1 className='home-page-title'>Featured Products</h1>
-                {/* Replace the old JSX with the new component */}
+                <h1 className='home-page-title'>{t('featured_products')}</h1>
             </div>
-            <p className='home-page-description'>Explore our products below</p>
+            <p className='home-page-description'>{t('home_page_description')}</p>
             <SortControl currentSort={currentSort} onSortChange={handleSortChange} />
 
             {loading && <p>Loading products...</p>}

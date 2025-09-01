@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { useParams, Link } from 'react-router-dom';
 import { getProductById } from '../../../api/products';
 import { addToCart } from '../../../api/cart';
@@ -9,6 +10,7 @@ import { useToast } from '../../../contexts/ToastContext';
 import './style.css';
 
 function ProductDetailPage() {
+    const { t } = useTranslation();
     const { user, token } = useAuth();
     const { productId } = useParams();
     const { refreshCart } = useCart();
@@ -111,6 +113,10 @@ function ProductDetailPage() {
         }
     };
 
+    const transformCategoryName = (categoryName) => {
+        return categoryName.toLowerCase().replace(/ /g, '_');
+    }
+
     return (
         <div className="product-detail-container">
             <div className="product-detail-card">
@@ -119,11 +125,11 @@ function ProductDetailPage() {
                         <h1 className="product-title">{product.name}</h1>
                         {product.provider_name && (
                             <div className="product-provider">
-                                Sold by: {product.provider_name}
+                                {t('sold_by')}: {product.provider_name}
                             </div>
                         )}
                     </div>
-                    <span className="product-category">{product.category_name}</span>
+                    <span className="product-category">{t(transformCategoryName(product.category_name))}</span>
                 </div>
                 <img src={getImageUrl(product.category_name)} alt={product.name} className="product-detail-image" />
                 <p className="product-description">{product.description}</p>
@@ -132,7 +138,7 @@ function ProductDetailPage() {
                     <span className="product-price-large">${product.price}</span>
                     <div className="purchase-actions">
                         <span className={`product-stock-status ${product.stock_quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                            {product.stock_quantity > 0 ? `In Stock: ${product.stock_quantity}` : 'Out of Stock'}
+                            {product.stock_quantity > 0 ? t('in_stock') + `: ${product.stock_quantity}` : t('out_of_stock')}
                         </span>
                         <button onClick={handleToggleWishlist} className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}>
                             ❤
@@ -142,18 +148,18 @@ function ProductDetailPage() {
                             disabled={product.stock_quantity === 0}
                             onClick={handleAddToCart}
                         >
-                            Add to Cart
+                            {t('add_to_cart')}
                         </button>
                         {user && (user.role === 'admin' || user.id === product.provider_id) && (
                             <Link to={`/provider/edit-product/${product.id}`} className="edit-product-btn">
-                                Edit Product
+                                {t('edit_product')}
                             </Link>
                         )}
                     </div>
                 </div>
 
                 <div className="product-attributes">
-                    <h2>Specifications</h2>
+                    <h2>{t('specifications')}</h2>
                     <ul className="attributes-list">
                         {product.attributes.map((attr, index) => (
                             <li key={index} className="attribute-item">

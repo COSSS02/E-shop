@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getProductsByCategory } from '../../../api/products';
 import { getCategoryFilters } from '../../../api/attributes';
@@ -8,6 +9,7 @@ import SortControl from '../../../components/sortcontrol/SortControl';
 import './style.css';
 
 function CategoryPage() {
+    const { t } = useTranslation();
     const { categoryName } = useParams();
     const [products, setProducts] = useState([]);
     const [category, setCategory] = useState(null);
@@ -86,14 +88,22 @@ function CategoryPage() {
         setSearchParams(newParams);
     };
 
+    const transformCategoryName = (categoryName) => {
+        return categoryName.toLowerCase().replace(/ /g, '_');
+    }
+
+    const getCategoryDescription = (categoryName) => {
+        return transformCategoryName(categoryName) + '_description';
+    }
+
     return (
         <div className="category-page-container">
-            <h1>{categoryName}</h1>
-            {category && <p className="category-description">{category.description}</p>}
+            <h1>{t(transformCategoryName(categoryName))}</h1>
+            {category && <p className="category-description">{t(getCategoryDescription(categoryName))}</p>}
             <SortControl currentSort={currentSort} onSortChange={handleSortChange} />
 
             <aside className="filter-sidebar">
-                <h3>Filters</h3>
+                <h3>{t("filters")}</h3>
                 {availableFilters.map(filter => (
                     <div key={filter.attributeName} className="filter-group">
                         <label htmlFor={filter.attributeName}>{filter.attributeName}</label>
@@ -115,7 +125,7 @@ function CategoryPage() {
                 <>
                     {products.length > 0
                         ? <ProductList products={products} />
-                        : <p>No products found in this category.</p>
+                        : <p>{t('no_product_in_category')}</p>
                     }
                     {pagination && (
                         <Pagination

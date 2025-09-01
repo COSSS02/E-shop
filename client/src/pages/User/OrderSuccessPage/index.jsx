@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'; // 1. Import useRef
+import { useTranslation } from "react-i18next";
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
@@ -6,6 +7,7 @@ import { fulfillOrder } from '../../../api/checkout';
 import './style.css';
 
 function OrderSuccessPage() {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const [status, setStatus] = useState('processing');
     const [error, setError] = useState('');
@@ -45,30 +47,30 @@ function OrderSuccessPage() {
 
         verifyPayment();
 
-    }, [searchParams, token, refreshCart]); 
+    }, [searchParams, token, refreshCart]);
 
     return (
         <div className="order-status-container">
             {status === 'processing' && (
                 <>
-                    <h2>Processing Your Order...</h2>
-                    <p>Please wait while we confirm your payment.</p>
+                    <h2>{t('processing_order')}</h2>
+                    <p>{t('wait_for_order')}</p>
                 </>
             )}
             {status === 'success' && (
                 <>
-                    <h2>Thank You For Your Order!</h2>
-                    <p>Your payment was successful and your order has been placed.</p>
-                    <p>Your Order ID is: <strong>#{orderId}</strong></p>
-                    <Link to="/profile" className="status-link">View Order History</Link>
+                    <h2>{t('thank_you')}</h2>
+                    <p>{t('order_success')}</p>
+                    <p>{t('order_id')}: <strong>#{orderId}</strong></p>
+                    <Link to="/profile" className="status-link">{t('view_order_history')}</Link>
                 </>
             )}
             {status === 'error' && (
                 <>
-                    <h2>Order Failed</h2>
-                    <p>There was a problem processing your order.</p>
+                    <h2>{t('order_failed')}</h2>
+                    <p>{t('payment_failed')}</p>
                     <p className="error-message">{error}</p>
-                    <Link to="/cart" className="status-link">Return to Cart</Link>
+                    <Link to="/cart" className="status-link">{t('return_to_cart')}</Link>
                 </>
             )}
         </div>

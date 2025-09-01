@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
 import { getCart, updateCartItem, removeFromCart } from '../../../api/cart';
@@ -13,6 +14,7 @@ import './style.css';
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 function CartPage() {
+    const { t } = useTranslation();
     const [cartItems, setCartItems] = useState([]);
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -106,10 +108,10 @@ function CartPage() {
 
     return (
         <div className="cart-container">
-            <h1>Your Shopping Cart</h1>
+            <h1>{t('your_cart')}</h1>
             {error && <p className="error-message">{error}</p>}
             {cartItems.length === 0 ? (
-                <p>Your cart is empty. <Link to="/">Go shopping!</Link></p>
+                <p>{t('cart_empty')} <Link to="/">{t('go_shopping')}</Link></p>
             ) : (
                 <div className="cart-layout">
                     <div className="cart-items-list">
@@ -117,7 +119,7 @@ function CartPage() {
                             <div key={item.product_id} className="cart-item">
                                 <div className="cart-item-info">
                                     <Link to={`/products/${item.product_id}`}><h4>{item.name}</h4></Link>
-                                    <p>Price: <strong>${item.price}</strong></p>
+                                    <p>{t('price')}: <strong>${item.price}</strong></p>
                                 </div>
                                 <div className="cart-item-actions">
                                     <QuantitySelector
@@ -125,36 +127,36 @@ function CartPage() {
                                         maxQuantity={item.stock_quantity}
                                         onQuantityChange={(newQuantity) => handleUpdateQuantity(item.product_id, newQuantity)}
                                     />
-                                    <button className='remove-button' onClick={() => handleRemoveItem(item.product_id)}>Remove</button>
+                                    <button className='remove-button' onClick={() => handleRemoveItem(item.product_id)}>{t('remove')}</button>
                                 </div>
                             </div>
                         ))}
                     </div>
                     <div className="cart-summary">
-                        <h2>Order Summary</h2>
-                        <p>Total: <strong>${total.toFixed(2)}</strong></p>
+                        <h2>{t('order_summary')}</h2>
+                        <p>{t('total')}: <strong>${total.toFixed(2)}</strong></p>
                         <div className="address-selection">
-                            <Link to="/profile">Manage Addresses</Link>
-                            <h4>Shipping Address</h4>
+                            <Link to="/profile">{t('manage_addresses')}</Link>
+                            <h4>{t('shipping')}</h4>
                             <select value={shippingAddressId} onChange={e => setShippingAddressId(e.target.value)} required>
-                                <option value="">Select Shipping Address</option>
+                                <option value="">{t('select_shipping_address')}</option>
                                 {shippingAddresses.map(addr => <option key={addr.id} value={addr.id}>{addr.street}, {addr.city}</option>)}
                             </select>
 
-                            <h4>Billing Address</h4>
+                            <h4>{t('billing')}</h4>
                             {!useShippingForBilling && (
                                 <select value={billingAddressId} onChange={e => setBillingAddressId(e.target.value)} required>
-                                    <option value="">Select Billing Address</option>
+                                        <option value="">{t('select_billing_address')}</option>
                                     {billingAddresses.map(addr => <option key={addr.id} value={addr.id}>{addr.street}, {addr.city}</option>)}
                                 </select>
                             )}
                             <label>
                                 <input type="checkbox" checked={useShippingForBilling} onChange={e => setUseShippingForBilling(e.target.checked)} />
-                                Use shipping address for billing
+                                {t('use_shipping_for_billing')}
                             </label>
                         </div>
                             <button className="checkout-btn" onClick={handleProceedToPayment}>
-                                Proceed to Payment
+                                {t('proceed_to_payment')}
                             </button>
                     </div>
                 </div>

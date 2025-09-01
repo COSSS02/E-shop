@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 import { Link } from 'react-router-dom';
 import './OrderHistory.css';
 
@@ -13,27 +14,28 @@ const getOverallStatus = (items) => {
 };
 
 function OrderCard({ order }) {
+    const { t } = useTranslation();
     const [isExpanded, setIsExpanded] = useState(false);
     const overallStatus = getOverallStatus(order.items);
 
     return (
         <div className="order-card">
             <div className="order-summary-row" onClick={() => setIsExpanded(!isExpanded)}>
-                <span className="order-id">Order #{order.id}</span>
+                <span className="order-id">{t('order')} #{order.id}</span>
                 <span className="order-date">{new Date(order.created_at).toLocaleDateString()}</span>
                 <span className="order-total">${order.total_amount}</span>
-                <span className={`order-status status-${overallStatus.toLowerCase().replace(' ', '-')}`}>{overallStatus}</span>
+                <span className={`order-status status-${overallStatus.toLowerCase().replace(' ', '-')}`}>{t(overallStatus)}</span>
                 <span className="order-toggle">{isExpanded ? '▲' : '▼'}</span>
             </div>
             {isExpanded && (
                 <div className="order-details">
-                    <h4>Order Items</h4>
+                    <h4>{t('order_items')}</h4>
                     <ul className="order-item-list">
                         {order.items.map(item => (
                             <li key={item.product_id}>
                                 <Link to={`/products/${item.product_id}`} className="item-name">{item.product_name}</Link>
-                                <span className="item-qty">Qty: {item.quantity}</span>
-                                <span className={`item-status status-${item.status.toLowerCase()}`}>{item.status}</span>
+                                <span className="item-qty">{t('qty')}: {item.quantity}</span>
+                                <span className={`item-status status-${item.status.toLowerCase()}`}>{t(item.status)}</span>
                             </li>
                         ))}
                     </ul>

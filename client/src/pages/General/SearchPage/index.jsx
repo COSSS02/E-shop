@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { searchProducts } from '../../../api/products';
 import ProductList from '../../../components/products/ProductList';
@@ -7,6 +8,7 @@ import SortControl from '../../../components/sortcontrol/SortControl';
 import './style.css';
 
 function SearchPage() {
+    const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
     const query = searchParams.get('q');
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
@@ -61,7 +63,7 @@ function SearchPage() {
 
     return (
         <div className="search-page-container">
-            <h1>Search Results for "{query}"</h1>
+            <h1>{t('search_results')}"{query}"</h1>
             <SortControl currentSort={currentSort} onSortChange={handleSortChange} />
 
             {loading && <p>Searching...</p>}
@@ -70,7 +72,7 @@ function SearchPage() {
                 <>
                     {products.length > 0
                         ? <ProductList products={products} />
-                        : <p>No products found matching your search.</p>
+                        : <p>{t('no_products_found')}</p>
                     }
                     {pagination && (
                         <Pagination
