@@ -3,9 +3,11 @@ import { useTranslation } from "react-i18next";
 import { useParams, Link } from 'react-router-dom';
 import { getProductById } from '../../../api/products';
 import { addToCart } from '../../../api/cart';
+import { getProductsByCategory } from '../../../api/products';
+import { getWishlist, addToWishlist, removeFromWishlist } from '../../../api/wishlist';
+import ProductList from '../../../components/products/ProductList';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
-import { getWishlist, addToWishlist, removeFromWishlist } from '../../../api/wishlist';
 import { useToast } from '../../../contexts/ToastContext';
 import './style.css';
 
@@ -18,25 +20,37 @@ function ProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isInWishlist, setIsInWishlist] = useState(false);
+    const [recommendations, setRecommendations] = useState([]);
     const { addToast } = useToast();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
+                setProduct(null); // Reset product on ID change
+                setRecommendations([]); // Reset recommendations
 
                 // Fetch product details and the user's wishlist in parallel
                 const productPromise = getProductById(productId);
-                const wishlistPromise = token ? getWishlist(token) : Promise.resolve([]); // Only fetch if logged in
+                const wishlistPromise = token ? getWishlist(token) : Promise.resolve([]);
 
                 const [productData, wishlistData] = await Promise.all([productPromise, wishlistPromise]);
 
                 setProduct(productData);
 
-                // Check if the current product is in the user's wishlist
                 if (wishlistData && productData) {
                     const isProductInWishlist = wishlistData.some(item => item.id === productData.id);
                     setIsInWishlist(isProductInWishlist);
+                }
+
+                // After fetching the main product, get recommendations
+                if (productData && productData.category_name) {
+                    const recommendationsData = await getProductsByCategory(productData.category_name, 1, 'created_at-desc', { limit: 5 });
+                    // Filter out the current product and limit to 4 recommendations
+                    const filteredRecs = recommendationsData.products
+                        .filter(p => p.id !== productData.id)
+                        .slice(0, 4);
+                    setRecommendations(filteredRecs);
                 }
 
             } catch (err) {
@@ -47,7 +61,8 @@ function ProductDetailPage() {
         };
 
         fetchData();
-    }, [productId, token]); // Re-run effect if the productId in the URL changes
+        window.scrollTo(0, 0);
+    }, [productId, token]);
 
     if (loading) {
         return <div className="product-detail-container"><p>Loading...</p></div>;
@@ -170,6 +185,14 @@ function ProductDetailPage() {
                     </ul>
                 </div>
             </div>
+
+            {recommendations.length > 0 && (
+                <div className="recommendations-section">
+                    <h2>{t('you_might_also_like')}</h2>
+                    <ProductList products={recommendations} />
+                </div>
+            )}
+
         </div>
     );
 }
