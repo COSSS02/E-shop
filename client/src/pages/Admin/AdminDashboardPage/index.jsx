@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { getAdminDashboard } from '../../../api/dashboard';
 import './style.css';
 
 function AdminDashboardPage() {
+    const { t } = useTranslation();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const { token } = useAuth();
@@ -32,27 +34,27 @@ function AdminDashboardPage() {
 
     return (
         <div className="admin-dashboard-container">
-            <h1>Admin Dashboard</h1>
+            <h1>{t('admin')} - {t('dashboard')}</h1>
             <div className="dashboard-grid">
                 {/* Stat Cards */}
-                <StatCard title="Total Revenue" value={`$${Number(salesStats.totalRevenue || 0).toFixed(2)}`} />
-                <StatCard title="Total Orders" value={salesStats.totalOrders || 0} />
-                <StatCard title="Total Users" value={userStats.totalUsers || 0} />
-                <StatCard title="Total Products" value={productStats.totalProducts || 0} />
+                <StatCard title={t('total_revenue')} value={`$${Number(salesStats.totalRevenue || 0).toFixed(2)}`} />
+                <StatCard title={t('total_orders')} value={salesStats.totalOrders || 0} />
+                <StatCard title={t('total_users')} value={userStats.totalUsers || 0} />
+                <StatCard title={t('total_products')} value={productStats.totalProducts || 0} />
 
                 {/* List Cards */}
-                <DashboardListCard title="Recent Orders" data={recentOrders} renderItem={item => (
+                <DashboardListCard title={t('recent_orders')} data={recentOrders} renderItem={item => (
                     <Link to="/admin/order-management">
-                        Order #{item.id} by {item.first_name} - ${Number(item.total_amount).toFixed(2)}
+                        {t('order')} #{item.id} {t('by')} {item.first_name} - ${Number(item.total_amount).toFixed(2)}
                     </Link>
-                )} emptyMessage="No recent orders." />
+                )} emptyMessage={t('no_recent_orders')} />
 
-                <DashboardListCard title="New Users" data={recentUsers} renderItem={item => (
+                <DashboardListCard title={t('new_users')} data={recentUsers} renderItem={item => (
                     <Link to="/admin/user-management">
                         {item.first_name} {item.last_name} ({item.email})
-                        <small>Role: <span className={`role-badge role-${item.role}`}>{item.role}</span></small>
+                        <small>{t('role')}: <span className={`role-badge role-${item.role}`}>{t(item.role)}</span></small>
                     </Link>
-                )} emptyMessage="No new users." />
+                )} emptyMessage={t('no_new_users')} />
             </div>
         </div>
     );

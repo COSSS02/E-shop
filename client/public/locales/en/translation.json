@@ -178,13 +178,41 @@
 
     "total_revenue": "Total Revenue",
     "total_orders": "Total Orders",
+    "total_users": "Total Users",
+    "total_products": "Total Products",
     "items_sold": "Items Sold",
+    "new_users": "New Users",
     "low_stock_alerts": "Low Stock Alerts",
     "top_selling_products": "Top Selling Products",
     "recent_orders": "Recent Orders",
     "stock": "Stock",
     "sold": "Sold",
+    "role": "Role",
+    "by" : "by",
     "no_low_products": "No products are low on stock.",
     "no_sales_data": "No sales data yet.",
-    "no_recent_orders": "No recent orders."
+    "no_recent_orders": "No recent orders.",
+    "no_new_users": "No new users.",
+
+    "create_new_category": "Create New Category",
+    "add_new_category": "Add a new product category to the store.",
+    "category_name": "Category Name",
+    "category_description": "Category Description",
+    "create_category": "Create Category",
+
+    "all_roles": "All Roles",
+    "all_types": "All Types",
+    "user": "User",
+    "type": "Type",
+    "joined": "Joined",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "edit_user": "Edit User",
+    "edit_address": "Edit Address",
+
+    "ph_user_management": "Search by name, email, company...",
+    "ph_address_management": "Search by street, city, user, email...",
+    "ph_product_management": "Search products, categories, providers...",
+    "ph_order_management": "Search by order ID, email, name..."
 }

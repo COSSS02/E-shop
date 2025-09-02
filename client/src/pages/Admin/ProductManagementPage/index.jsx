@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from "react-i18next";
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useToast } from '../../../contexts/ToastContext';
@@ -8,6 +9,7 @@ import SortControl from '../../../components/sortcontrol/SortControl';
 import './style.css';
 
 function AdminProductManagementPage() {
+    const { t } = useTranslation();
     const [products, setProducts] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -88,11 +90,11 @@ function AdminProductManagementPage() {
 
     return (
         <div className="admin-product-container">
-            <h1>Product Management</h1>
+            <h1>{t('product_management')}</h1>
             <div className="toolbar">
                 <input
                     type="text"
-                    placeholder="Search products, categories, providers..."
+                    placeholder={t('ph_product_management')}
                     value={inputValue}
                     onChange={handleSearchChange}
                     className="search-input"
@@ -107,12 +109,12 @@ function AdminProductManagementPage() {
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Product Name</th>
-                                    <th>Category</th>
-                                    <th>Provider</th>
-                                    <th>Price</th>
-                                    <th>Stock</th>
-                                    <th>Actions</th>
+                                    <th>{t('product_name')}</th>
+                                    <th>{t('category')}</th>
+                                    <th>{t('provider')}</th>
+                                    <th>{t('price')}</th>
+                                    <th>{t('stock')}</th>
+                                    <th>{t('actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,8 +127,8 @@ function AdminProductManagementPage() {
                                         <td>${Number(product.price).toFixed(2)}</td>
                                         <td>{product.stock_quantity}</td>
                                         <td className="actions-cell">
-                                            <Link to={`/provider/edit-product/${product.id}`} className="action-btn edit-btn">Edit</Link>
-                                            <button onClick={() => handleDelete(product.id, product.name)} className="action-btn delete-btn">Delete</button>
+                                            <Link to={`/provider/edit-product/${product.id}`} className="action-btn edit-btn">{t('edit')}</Link>
+                                            <button onClick={() => handleDelete(product.id, product.name)} className="action-btn delete-btn">{t('delete')}</button>
                                         </td>
                                     </tr>
                                 ))}

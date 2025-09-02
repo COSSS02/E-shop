@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from "react-i18next";
 import { useAuth } from '../../../contexts/AuthContext';
 import { useToast } from '../../../contexts/ToastContext';
 import { getAllAddresses, updateAddressAsAdmin, deleteAddressAsAdmin } from '../../../api/address';
 import './style.css';
 
 function AdminAddressManagementPage() {
+    const { t } = useTranslation();
     const { token } = useAuth();
     const { addToast } = useToast();
     const [addresses, setAddresses] = useState([]);
@@ -74,26 +76,26 @@ function AdminAddressManagementPage() {
 
     return (
         <div className="admin-address-container">
-            <h1>Address Management</h1>
+            <h1>{t('address_management')}</h1>
 
             <div className="toolbar">
                 <input
                     type="text"
-                    placeholder="Search (street, city, user, email)..."
+                    placeholder={t('ph_address_management')}
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
                 />
                 <select value={filterRole} onChange={e => setFilterRole(e.target.value)}>
-                    <option value="all">All Roles</option>
-                    <option value="client">Clients</option>
-                    <option value="provider">Providers</option>
-                    <option value="admin">Admins</option>
+                    <option value="all">{t('all_roles')}</option>
+                    <option value="client">{t('client')}</option>
+                    <option value="provider">{t('provider')}</option>
+                    <option value="admin">{t('admin')}</option>
                 </select>
                 <select value={filterType} onChange={e => setFilterType(e.target.value)}>
-                    <option value="all">All Types</option>
-                    <option value="shipping">Shipping</option>
-                    <option value="billing">Billing</option>
-                    <option value="provider">Provider</option>
+                    <option value="all">{t('all_types')}</option>
+                    <option value="shipping">{t('shipping')}</option>
+                    <option value="billing">{t('billing')}</option>
+                    <option value="provider">{t('provider')}</option>
                 </select>
             </div>
 
@@ -102,16 +104,16 @@ function AdminAddressManagementPage() {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>User</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Type</th>
-                            <th>Street</th>
-                            <th>City</th>
-                            <th>State</th>
-                            <th>Zip</th>
-                            <th>Country</th>
-                            <th>Actions</th>
+                            <th>{t('user')}</th>
+                            <th>{t('email')}</th>
+                            <th>{t('role')}</th>
+                            <th>{t('type')}</th>
+                            <th>{t('street')}</th>
+                            <th>{t('city')}</th>
+                            <th>{t('state')}</th>
+                            <th>{t('zip_code')}</th>
+                            <th>{t('country')}</th>
+                            <th>{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -121,15 +123,15 @@ function AdminAddressManagementPage() {
                                 <td>{addr.first_name} {addr.last_name}</td>
                                 <td>{addr.email}</td>
                                 <td><span className={`role-badge role-${addr.role}`}>{addr.role}</span></td>
-                                <td>{addr.address_type}</td>
+                                <td>{t(addr.address_type)}</td>
                                 <td>{addr.street}</td>
                                 <td>{addr.city}</td>
                                 <td>{addr.state}</td>
                                 <td>{addr.zip_code}</td>
                                 <td>{addr.country}</td>
                                 <td className="actions-cell">
-                                    <button className="action-btn edit-btn" onClick={() => setEditing(addr)}>Edit</button>
-                                    <button className="action-btn delete-btn" onClick={() => handleDelete(addr.id)}>Delete</button>
+                                    <button className="action-btn edit-btn" onClick={() => setEditing(addr)}>{t('edit')}</button>
+                                    <button className="action-btn delete-btn" onClick={() => handleDelete(addr.id)}>{t('delete')}</button>
                                 </td>
                             </tr>
                         ))}
@@ -155,6 +157,7 @@ function AdminAddressManagementPage() {
 
 // The EditAddressModal component remains unchanged
 const EditAddressModal = ({ address, onClose, onSave }) => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         addressType: address.address_type,
         street: address.street,
@@ -173,24 +176,24 @@ const EditAddressModal = ({ address, onClose, onSave }) => {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <h2>Edit Address #{address.id}</h2>
+                <h2>{t('edit_address')} #{address.id}</h2>
                 <form onSubmit={submit} className="modal-form">
                     <div className="form-group">
-                        <label>Type</label>
+                        <label>{t('type')}</label>
                         <select name="addressType" value={formData.addressType} onChange={handleChange}>
-                            <option value="shipping">shipping</option>
-                            <option value="billing">billing</option>
-                            <option value="provider">provider</option>
+                            <option value="shipping">{t('shipping')}</option>
+                            <option value="billing">{t('billing')}</option>
+                            <option value="provider">{t('provider')}</option>
                         </select>
                     </div>
-                    <div className="form-group"><label>Street</label><input name="street" value={formData.street} onChange={handleChange} /></div>
-                    <div className="form-group"><label>City</label><input name="city" value={formData.city} onChange={handleChange} /></div>
-                    <div className="form-group"><label>State</label><input name="state" value={formData.state} onChange={handleChange} /></div>
-                    <div className="form-group"><label>Zip</label><input name="zipCode" value={formData.zipCode} onChange={handleChange} /></div>
-                    <div className="form-group"><label>Country</label><input name="country" value={formData.country} onChange={handleChange} /></div>
+                    <div className="form-group"><label>{t('street')}</label><input name="street" value={formData.street} onChange={handleChange} /></div>
+                    <div className="form-group"><label>{t('city')}</label><input name="city" value={formData.city} onChange={handleChange} /></div>
+                    <div className="form-group"><label>{t('state')}</label><input name="state" value={formData.state} onChange={handleChange} /></div>
+                    <div className="form-group"><label>{t('zip_code')}</label><input name="zipCode" value={formData.zipCode} onChange={handleChange} /></div>
+                    <div className="form-group"><label>{t('country')}</label><input name="country" value={formData.country} onChange={handleChange} /></div>
                     <div className="modal-actions">
-                        <button type="submit" className="action-btn edit-btn">Save</button>
-                        <button type="button" onClick={onClose} className="action-btn cancel-btn">Cancel</button>
+                        <button type="submit" className="action-btn edit-btn">{t('save_changes')}</button>
+                        <button type="button" onClick={onClose} className="action-btn cancel-btn">{t('cancel')}</button>
                     </div>
                 </form>
             </div>

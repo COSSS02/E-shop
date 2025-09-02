@@ -178,13 +178,41 @@
 
     "total_revenue": "Venit Total",
     "total_orders": "Comenzi Totale",
+    "total_users": "Utilizatori Totali",
+    "total_products": "Produse Totale",
     "items_sold": "Produse Vândute",
+    "new_users": "Utilizatori Noi",
     "low_stock_alerts": "Alerte Stoc Scăzut",
     "top_selling_products": "Cele Mai Vândute Produse",
     "recent_orders": "Comenzi Recente",
     "stock": "Stoc",
     "sold": "Vândute",
+    "role": "Rol",
+    "by" : "de",
     "no_low_products": "Niciun produs nu are stoc scăzut.",
     "no_sales_data": "Încă nu există date de vânzări.",
-    "no_recent_orders": "Nicio comandă recentă."
+    "no_recent_orders": "Nicio comandă recentă.",
+    "no_new_users": "Niciun utilizator nou.",
+
+    "create_new_category": "Creează o Categorie Nouă",
+    "add_new_category": "Adaugă o nouă categorie de produse în magazin.",
+    "category_name": "Numele Categoriei",
+    "category_description": "Descrierea Categoriei",
+    "create_category": "Creează Categoria",
+
+    "all_roles": "Toate Rolurile",
+    "all_types": "Toate Tipurile",
+    "user": "Utilizator",
+    "type": "Tip",
+    "joined": "S-a Alăturat",
+    "actions": "Acțiuni",
+    "edit": "Editează",
+    "delete": "Șterge",
+    "edit_user": "Editează Utilizatorul",
+    "edit_address": "Editează Adresa",
+
+    "ph_user_management": "Caută după nume, email, companie...",
+    "ph_address_management": "Caută după stradă, oraș, utilizator, email...",
+    "ph_product_management": "Caută produse, categorii, furnizori...",
+    "ph_order_management": "Caută după ID comandă, email, nume..."
 }

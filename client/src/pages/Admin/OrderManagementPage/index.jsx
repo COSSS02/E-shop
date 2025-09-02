@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from "react-i18next";
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useToast } from '../../../contexts/ToastContext';
@@ -7,6 +8,7 @@ import Pagination from '../../../components/pagination/Pagination';
 import './style.css';
 
 function AdminOrderManagementPage() {
+    const { t } = useTranslation();
     const [orders, setOrders] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -68,11 +70,11 @@ function AdminOrderManagementPage() {
 
     return (
         <div className="admin-order-container">
-            <h1>Order Management</h1>
+            <h1>{t('order_management')}</h1>
             <div className="toolbar">
                 <input
                     type="text"
-                    placeholder="Search by Order ID, User Email, Name..."
+                    placeholder={t('ph_order_management')}
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
                     className="search-input"
@@ -104,6 +106,7 @@ function AdminOrderManagementPage() {
 }
 
 const OrderCard = ({ order, onStatusChange }) => {
+    const { t } = useTranslation();
     const [isExpanded, setIsExpanded] = useState(false);
     const statusOptions = ['Pending', 'Processing', 'Shipped', 'Cancelled'];
 
@@ -120,12 +123,12 @@ const OrderCard = ({ order, onStatusChange }) => {
             </div>
             {isExpanded && (
                 <div className="order-details-admin">
-                    <h4>Order Items</h4>
+                    <h4>{t('order_items')}</h4>
                     <div className="items-header">
-                        <span>Product</span>
-                        <span>Quantity</span>
-                        <span>Price</span>
-                        <span>Status</span>
+                        <span>{t('product')}</span>
+                        <span>{t('quantity')}</span>
+                        <span>{t('price')}</span>
+                        <span>{t('status')}</span>
                     </div>
                     <ul className="order-item-list-admin">
                         {order.items.map(item => (
@@ -139,7 +142,7 @@ const OrderCard = ({ order, onStatusChange }) => {
                                     className={`status-select status-${item.status.toLowerCase()}`}
                                     onClick={e => e.stopPropagation()} // Prevent card from collapsing
                                 >
-                                    {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                    {statusOptions.map(opt => <option key={opt} value={opt}>{t(opt)}</option>)}
                                 </select>
                             </li>
                         ))}

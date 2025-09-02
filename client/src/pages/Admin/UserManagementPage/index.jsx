@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from "react-i18next";
 import { useAuth } from '../../../contexts/AuthContext';
 import { useToast } from '../../../contexts/ToastContext';
 import { getAllUsers, deleteUserAsAdmin, updateUserAsAdmin } from '../../../api/user';
 import './style.css';
 
 function AdminUserManagementPage() {
+    const { t } = useTranslation();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingUser, setEditingUser] = useState(null);
@@ -79,19 +81,19 @@ function AdminUserManagementPage() {
 
     return (
         <div className="admin-page-container">
-            <h1>User Management</h1>
+            <h1>{t('user_management')}</h1>
             <div className="toolbar">
                 <input
                     type="text"
-                    placeholder="Search by name, email, company..."
+                    placeholder={t('ph_user_management')}
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
                 />
                 <select value={filterRole} onChange={e => setFilterRole(e.target.value)}>
-                    <option value="all">All Roles</option>
-                    <option value="client">Client</option>
-                    <option value="provider">Provider</option>
-                    <option value="admin">Admin</option>
+                    <option value="all">{t('all_roles')}</option>
+                    <option value="client">{t('client')}</option>
+                    <option value="provider">{t('provider')}</option>
+                    <option value="admin">{t('admin')}</option>
                 </select>
             </div>
             <div className="admin-table-container">
@@ -99,12 +101,12 @@ function AdminUserManagementPage() {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Company</th>
-                            <th>Joined</th>
-                            <th>Actions</th>
+                            <th>{t('name')}</th>
+                            <th>{t('email')}</th>
+                            <th>{t('role')}</th>
+                            <th>{t('company')}</th>
+                            <th>{t('joined')}</th>
+                            <th>{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -113,12 +115,12 @@ function AdminUserManagementPage() {
                                 <td>{user.id}</td>
                                 <td>{user.first_name} {user.last_name}</td>
                                 <td>{user.email}</td>
-                                <td><span className={`role-badge role-${user.role}`}>{user.role}</span></td>
+                                <td><span className={`role-badge role-${user.role}`}>{t(user.role)}</span></td>
                                 <td>{user.company_name || 'N/A'}</td>
                                 <td>{new Date(user.created_at).toLocaleDateString()}</td>
                                 <td className="actions-cell">
-                                    <button onClick={() => setEditingUser(user)} className="action-btn edit-btn">Edit</button>
-                                    <button onClick={() => handleDelete(user.id)} className="action-btn delete-btn">Delete</button>
+                                    <button onClick={() => setEditingUser(user)} className="action-btn edit-btn">{t('edit')}</button>
+                                    <button onClick={() => handleDelete(user.id)} className="action-btn delete-btn">{t('delete')}</button>
                                 </td>
                             </tr>
                         ))}
@@ -138,6 +140,7 @@ function AdminUserManagementPage() {
 
 // The EditUserModal component remains unchanged
 const EditUserModal = ({ user, onClose, onSave }) => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         firstName: user.first_name,
         lastName: user.last_name,
@@ -158,37 +161,37 @@ const EditUserModal = ({ user, onClose, onSave }) => {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <h2>Edit User: {user.first_name} {user.last_name}</h2>
+                <h2>{t('edit_user')}: {user.first_name} {user.last_name}</h2>
                 <form onSubmit={handleSubmit} className="modal-form">
                     <div className="form-group">
-                        <label>First Name</label>
+                        <label>{t('first_name')}</label>
                         <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
                     </div>
                     <div className="form-group">
-                        <label>Last Name</label>
+                        <label>{t('last_name')}</label>
                         <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
                     </div>
                     <div className="form-group">
-                        <label>Email</label>
+                        <label>{t('email')}</label>
                         <input type="email" name="email" value={formData.email} onChange={handleChange} />
                     </div>
                     <div className="form-group">
-                        <label>Role</label>
+                        <label>{t('role')}</label>
                         <select name="role" value={formData.role} onChange={handleChange}>
-                            <option value="client">Client</option>
-                            <option value="provider">Provider</option>
-                            <option value="admin">Admin</option>
+                            <option value="client">{t('client')}</option>
+                            <option value="provider">{t('provider')}</option>
+                            <option value="admin">{t('admin')}</option>
                         </select>
                     </div>
                     {formData.role === 'provider' && (
                         <div className="form-group">
-                            <label>Company Name</label>
+                            <label>{t('company')}</label>
                             <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} />
                         </div>
                     )}
                     <div className="modal-actions">
-                        <button type="submit" className="action-btn edit-btn">Save Changes</button>
-                        <button type="button" onClick={onClose} className="action-btn cancel-btn">Cancel</button>
+                        <button type="submit" className="action-btn edit-btn">{t('save_changes')}</button>
+                        <button type="button" onClick={onClose} className="action-btn cancel-btn">{t('cancel')}</button>
                     </div>
                 </form>
             </div>
