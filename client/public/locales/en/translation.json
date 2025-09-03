@@ -85,6 +85,7 @@
     "discount_price": "Discount Price",
     "discount_start": "Discount Start Date",
     "discount_end": "Discount End Date",
+    "delete_product": "Delete Product",
     "leave_empty_for_no_discount" : "Leave empty for no discount",
     "you_might_also_like": "You might also like",
 

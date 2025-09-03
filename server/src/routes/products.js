@@ -26,6 +26,6 @@ router.get('/:id', productController.getProductById);
 router.put('/:id', authMiddleware, productController.updateProduct);
 
 // DELETE /api/products/:id - Delete a product by its ID (Admin only)
-router.delete('/:id', authMiddleware, checkRole(['admin']), productController.deleteProduct);
+router.delete('/:id', authMiddleware, checkRole(['admin', 'provider']), productController.deleteProduct);
 
 module.exports = router;

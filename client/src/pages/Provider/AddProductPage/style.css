@@ -126,6 +126,30 @@
     cursor: not-allowed;
 }
 
+.form-actions-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: normal;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+}
+
+.delete-button {
+    padding: 0.75rem 1rem;
+    border: none;
+    background-color: #c0392b;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.delete-button:hover {
+    background-color: #9e3229;
+}
+
 .error-message,
 .success-message {
     padding: 0.75rem;

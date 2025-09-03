@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
-import { getProductById, updateProduct } from '../../../api/products';
+import { getProductById, updateProduct, deleteProduct } from '../../../api/products';
 import { getAllCategories } from '../../../api/categories';
 import { getAttributesByCategoryId } from '../../../api/attributes';
 // Reuse the same CSS as the AddProductPage
@@ -13,6 +13,7 @@ function EditProductPage() {
     const { productId } = useParams();
     const navigate = useNavigate();
     const { user, token } = useAuth();
+    const [ownerId, setOwnerId] = useState(null);
 
     // Form state
     const [name, setName] = useState('');
@@ -43,6 +44,8 @@ function EditProductPage() {
                     getProductById(productId),
                     getAllCategories()
                 ]);
+
+                setOwnerId(productData.provider_id);
 
                 // Security check: Does the logged-in user own this product?
                 if (user && user.role !== 'admin' && productData.provider_id !== user.id) {
@@ -131,6 +134,28 @@ function EditProductPage() {
             setTimeout(() => navigate(`/products/${productId}`), 2000);
         } catch (err) {
             setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!user) return;
+        const allowed = user.role === 'admin' || (ownerId && user.id === ownerId);
+        if (!allowed) return setError("You are not authorized to delete this product.");
+        if (!window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) return;
+
+        try {
+            setLoading(true);
+            await deleteProduct(productId, token);
+            setSuccess("Product deleted successfully.");
+            // Navigate back after a short delay; prefer previous page
+            setTimeout(() => {
+                if (user.role === 'provider') navigate('/provider/my-products');
+                else navigate(-1);
+            }, 800);
+        } catch (err) {
+            setError(err.message || 'Failed to delete product.');
         } finally {
             setLoading(false);
         }
@@ -230,9 +255,23 @@ function EditProductPage() {
                             </button>
                         </fieldset>
 
-                        <button type="submit" className="submit-button" disabled={loading}>
-                            {loading ? 'Saving...' : t('save_changes')}
-                        </button>
+                        <div className="form-actions-row">
+                            <button type="submit" className="submit-button" disabled={loading}>
+                                {loading ? 'Saving...' : t('save_changes')}
+                            </button>
+
+                            {(user && (user.role === 'admin' || (ownerId && user.id === ownerId))) && (
+                                <button
+                                    type="button"
+                                    className="delete-button"
+                                    onClick={handleDelete}
+                                    disabled={loading}
+                                    title="Delete product"
+                                >
+                                    {t('delete_product')}
+                                </button>
+                            )}
+                        </div>
                     </>
                 )}
             </form>

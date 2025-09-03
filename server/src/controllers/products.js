@@ -122,12 +122,23 @@ const productController = {
     async deleteProduct(req, res) {
         try {
             const { id } = req.params;
-            await Product.delete(Number(id))
+
+            // Ensure the product exists and get owner
+            const product = await Product.findById(Number(id));
+            if (!product) {
+                return res.status(404).json({ message: "Product not found." });
+            }
+
+            // Only admin or the product's provider can delete
+            const isAdmin = req.user.role === 'admin';
+            const isOwner = product.provider_id === req.user.id;
+            if (!isAdmin && !isOwner) {
+                return res.status(403).json({ message: "You are not authorized to delete this product." });
+            }
+
+            await Product.delete(Number(id));
             res.status(200).json({ message: "Product deleted successfully." });
         } catch (error) {
-            if (error.message.includes("not found")) {
-                return res.status(404).json({ message: error.message });
-            }
             res.status(500).json({ message: "Error deleting product", error: error.message });
         }
     },
