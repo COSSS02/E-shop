@@ -8,7 +8,10 @@ const Cart = {
                 ci.quantity,
                 p.name,
                 p.price,
-                p.stock_quantity
+                p.stock_quantity,
+                p.discount_price,
+                p.discount_start_date,
+                p.discount_end_date
             FROM cart_items ci
             JOIN products p ON ci.product_id = p.id
             WHERE ci.user_id = ?

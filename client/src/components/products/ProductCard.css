@@ -7,6 +7,7 @@
     flex-direction: column;
     justify-content: space-between;
     transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
 }
 
 .product-card:hover {
@@ -43,8 +44,41 @@
 
 .product-price {
     font-size: 1.1rem;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.product-price .regular-price {
     color: #e67e22;
+    /* existing price color */
+    font-weight: bold;
+}
+
+.product-price .original-price {
+    color: #999;
+    text-decoration: line-through;
+    font-weight: normal;
+    font-size: 0.95rem;
+}
+
+.product-price .discounted-price {
+    color: #e74c3c;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #e74c3c;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 2;
 }
 
 .product-quantity {

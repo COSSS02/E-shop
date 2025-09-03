@@ -9,6 +9,7 @@ function SortControl({ currentSort, onSortChange }) {
             <label htmlFor="sort-select">{t('sort_by')}</label>
             <select id="sort-select" value={currentSort} onChange={onSortChange}>
                 <option value="created_at-desc">{t('newest')}</option>
+                <option value="discount-desc">{t('highest_discount')}</option>
                 <option value="name-asc">{t('alphabetical')}</option>
                 <option value="price-asc">{t('price_low_high')}</option>
                 <option value="price-desc">{t('price_high_low')}</option>

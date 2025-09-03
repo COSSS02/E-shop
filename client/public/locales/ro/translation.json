@@ -9,6 +9,7 @@
 
     "sort_by": "Sortează după:",
     "newest": "Cele mai noi",
+    "highest_discount": "Cea mai mare reducere",
     "alphabetical": "Alfabetic (A-Z)",
     "price_low_high": "Preț: Crescător",
     "price_high_low": "Preț: Descrescător",
@@ -80,6 +81,11 @@
     "out_of_stock": "Stoc Epuizat",
     "edit_product": "Editează Produsul",
     "specifications": "Specificații",
+    "discount": "Reducere",
+    "discount_price": "Preț Redus",
+    "discount_start": "Data de Început a Reducerii",
+    "discount_end": "Data de Sfârșit a Reducerii",
+    "leave_empty_for_no_discount": "Nu completa dacă nu dorești reducere",
     "you_might_also_like": "S-ar putea să-ți placă și",
 
     "client": "Client",

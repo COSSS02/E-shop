@@ -31,6 +31,23 @@
     color: #e67e22;
 }
 
+.cart-item-price {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cart-item-price .original-price {
+    color: #999;
+    text-decoration: line-through;
+    font-weight: normal;
+}
+
+.cart-item-price .discounted-price {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
 .cart-item-actions {
     display: flex;
     gap: 1rem;

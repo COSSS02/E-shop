@@ -9,6 +9,7 @@
 
     "sort_by": "Sort by:",
     "newest": "Newest",
+    "highest_discount": "Highest Discount",
     "alphabetical": "Alphabetical (A-Z)",
     "price_low_high": "Price: Low to High",
     "price_high_low": "Price: High to Low",
@@ -80,6 +81,11 @@
     "out_of_stock": "Out of Stock",
     "edit_product": "Edit Product",
     "specifications": "Specifications",
+    "discount": "Discount",
+    "discount_price": "Discount Price",
+    "discount_start": "Discount Start Date",
+    "discount_end": "Discount End Date",
+    "leave_empty_for_no_discount" : "Leave empty for no discount",
     "you_might_also_like": "You might also like",
 
     "client": "Client",

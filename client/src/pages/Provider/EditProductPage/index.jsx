@@ -22,6 +22,11 @@ function EditProductPage() {
     const [categoryId, setCategoryId] = useState('');
     const [attributes, setAttributes] = useState([{ attributeName: '', value: '' }]);
 
+    // State for discount fields
+    const [discountPrice, setDiscountPrice] = useState('');
+    const [discountStartDate, setDiscountStartDate] = useState('');
+    const [discountEndDate, setDiscountEndDate] = useState('');
+
     // Data and UI state
     const [categories, setCategories] = useState([]);
     const [categoryAttributes, setCategoryAttributes] = useState([]);
@@ -54,6 +59,10 @@ function EditProductPage() {
                 setAttributes(productData.attributes.map(attr => ({ attributeName: attr.name, value: attr.value })));
                 setCategories(allCategories);
 
+                setDiscountPrice(productData.discount_price || '');
+                setDiscountStartDate(productData.discount_start_date ? new Date(productData.discount_start_date).toISOString().slice(0, 16) : '');
+                setDiscountEndDate(productData.discount_end_date ? new Date(productData.discount_end_date).toISOString().slice(0, 16) : '');
+
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -74,6 +83,18 @@ function EditProductPage() {
         }
     }, [categoryId, token]);
 
+    const toMySQLDateTime = (inputValue) => {
+        // Accepts 'YYYY-MM-DDTHH:mm' or 'YYYY-MM-DD HH:mm' or already with seconds
+        if (!inputValue) return '';
+        // Normalize separator
+        const base = inputValue.replace('T', ' ').trim();
+        // Append seconds if missing
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(base)) {
+            return `${base}:00`;
+        }
+        // If already in 'YYYY-MM-DD HH:mm:ss', return as is
+        return base;
+    }
 
     const handleAttributeChange = (index, event) => {
         const newAttributes = [...attributes];
@@ -96,7 +117,10 @@ function EditProductPage() {
                 name,
                 description,
                 price: parseFloat(price),
-                stock_quantity: parseInt(stockQuantity, 10)
+                stock_quantity: parseInt(stockQuantity, 10),
+                discount_price: discountPrice ? parseFloat(discountPrice) : null,
+                discount_start_date: discountStartDate ? toMySQLDateTime(discountStartDate) : null,
+                discount_end_date: discountEndDate ? toMySQLDateTime(discountEndDate) : null
             },
             attributesData: attributes.filter(attr => attr.attributeName && attr.value)
         };
@@ -150,6 +174,26 @@ function EditProductPage() {
                             <div className="form-group">
                                 <label htmlFor="description">{t('description')} ({t('optional')})</label>
                                 <textarea id="description" rows="4" value={description} onChange={e => setDescription(e.target.value)}></textarea>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>{t('discount')}</legend>
+                            <div className="form-group-row">
+                                <div className="form-group">
+                                    <label htmlFor="discount_price">{t('discount_price')} ($)</label>
+                                    <input type="number" id="discount_price" value={discountPrice} onChange={e => setDiscountPrice(e.target.value)} min="0.01" step="0.01" placeholder={t('leave_empty_for_no_discount')} />
+                                </div>
+                            </div>
+                            <div className="form-group-row">
+                                <div className="form-group">
+                                    <label htmlFor="discount_start_date">{t('discount_start')}</label>
+                                    <input type="datetime-local" id="discount_start_date" value={discountStartDate} onChange={e => setDiscountStartDate(e.target.value)} />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="discount_end_date">{t('discount_end')}</label>
+                                    <input type="datetime-local" id="discount_end_date" value={discountEndDate} onChange={e => setDiscountEndDate(e.target.value)} />
+                                </div>
                             </div>
                         </fieldset>
 

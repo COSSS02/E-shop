@@ -14,12 +14,12 @@ const Product = {
             await connection.beginTransaction();
 
             // 1. Insert the core product
-            const { provider_id, category_id, name, description, price, stock_quantity } = productData;
+            const { provider_id, category_id, name, description, price, stock_quantity, discount_price, discount_start_date, discount_end_date } = productData;
             const productSql = `
-                INSERT INTO products (provider_id, category_id, name, description, price, stock_quantity)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO products (provider_id, category_id, name, description, price, stock_quantity, discount_price, discount_start_date, discount_end_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
-            const [productResult] = await connection.query(productSql, [provider_id, category_id, name, description, price, stock_quantity]);
+            const [productResult] = await connection.query(productSql, [provider_id, category_id, name, description, price, stock_quantity, discount_price, discount_start_date, discount_end_date]);
             const productId = productResult.insertId;
 
             // 2. Handle the attributes
@@ -90,7 +90,28 @@ const Product = {
             if (user.role !== 'admin' && productRows[0].provider_id !== user.id) throw new Error("User not authorized to edit this product.");
 
             // 1. Update the core product details
-            await connection.query('UPDATE products SET ? WHERE id = ?', [productData, productId]);
+            const {
+                name, description, price, stock_quantity, category_id,
+                discount_price, discount_start_date, discount_end_date
+            } = productData;
+
+            const productUpdateSql = `
+                UPDATE products SET
+                    name = ?,
+                    description = ?,
+                    price = ?,
+                    stock_quantity = ?,
+                    category_id = ?,
+                    discount_price = ?,
+                    discount_start_date = ?,
+                    discount_end_date = ?
+                WHERE id = ?
+            `;
+            await connection.query(productUpdateSql, [
+                name, description, price, stock_quantity, category_id,
+                discount_price, discount_start_date, discount_end_date,
+                productId
+            ]);
 
             // 2. Delete all old attributes for this product
             await connection.query('DELETE FROM product_attributes WHERE product_id = ?', [productId]);
@@ -192,6 +213,13 @@ const Product = {
         const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
         const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
 
+        let orderByClause;
+        if (sortBy === 'discount') {
+            orderByClause = `ORDER BY CASE WHEN p.discount_price IS NOT NULL AND NOW() BETWEEN p.discount_start_date AND p.discount_end_date THEN ((p.price - p.discount_price) / p.price) ELSE -1 END ${safeSortOrder}`;
+        } else {
+            orderByClause = `ORDER BY p.${safeSortBy} ${safeSortOrder}`;
+        }
+
         // Get total count for the provider
         const countSql = `SELECT COUNT(*) as total FROM products WHERE provider_id = ?`;
         const [[{ total }]] = await db.query(countSql, [providerId]);
@@ -200,11 +228,12 @@ const Product = {
         const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
+                p.discount_price, p.discount_start_date, p.discount_end_date,
                 c.name as category_name
             FROM products p
             JOIN categories c ON p.category_id = c.id
             WHERE p.provider_id = ?
-            ORDER BY ${safeSortBy} ${safeSortOrder}
+            ${orderByClause}
             LIMIT ?
             OFFSET ?
         `;
@@ -232,6 +261,14 @@ const Product = {
         const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
         const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
 
+        // Add special handling for discount sorting
+        let orderByClause;
+        if (sortBy === 'discount') {
+            orderByClause = `ORDER BY CASE WHEN p.discount_price IS NOT NULL AND NOW() BETWEEN p.discount_start_date AND p.discount_end_date THEN ((p.price - p.discount_price) / p.price) ELSE -1 END ${safeSortOrder}`;
+        } else {
+            orderByClause = `ORDER BY p.${safeSortBy} ${safeSortOrder}`;
+        }
+
         // First, get the total count of matching products
         const countSql = `
             SELECT COUNT(*) as total
@@ -245,11 +282,12 @@ const Product = {
         const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
+                p.discount_price, p.discount_start_date, p.discount_end_date,
                 c.name as category_name
             FROM products p
             JOIN categories c ON p.category_id = c.id
             ${commonWhereClause}
-            ORDER BY ${safeSortBy} ${safeSortOrder}
+            ${orderByClause}
             LIMIT ?
             OFFSET ?
         `;
@@ -274,6 +312,13 @@ const Product = {
         const allowedSortOrder = ['ASC', 'DESC'];
         const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : 'name';
         const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
+
+        let orderByClause;
+        if (sortBy === 'discount') {
+            orderByClause = `ORDER BY CASE WHEN p.discount_price IS NOT NULL AND NOW() BETWEEN p.discount_start_date AND p.discount_end_date THEN ((p.price - p.discount_price) / p.price) ELSE -1 END ${safeSortOrder}`;
+        } else {
+            orderByClause = `ORDER BY p.${safeSortBy} ${safeSortOrder}`;
+        }
 
         let filterClauses = '';
         let filterValues = [];
@@ -307,9 +352,10 @@ const Product = {
         const productsSql = `
             SELECT
                 p.id, p.name, p.description, p.price, p.stock_quantity,
+                p.discount_price, p.discount_start_date, p.discount_end_date,
                 c.name as category_name
             ${baseQuery}
-            ORDER BY ${safeSortBy} ${safeSortOrder}
+            ${orderByClause}
             LIMIT ?
             OFFSET ?
         `;
@@ -327,49 +373,32 @@ const Product = {
      * @returns {Promise<object>} An object containing the products array and the total count.
      */
     async findAll(limit, offset, sortBy = 'name', sortOrder = 'ASC', searchTerm = '') {
-        // Whitelist of allowed columns and orders
-        const allowedSortBy = ['name', 'price', 'stock_quantity', 'created_at'];
-        const allowedSortOrder = ['ASC', 'DESC'];
+        const safeSortOrder = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+        const validSortColumns = ['name', 'price', 'created_at', 'stock_quantity'];
 
-        // 1. Validate and sanitize user input
-        const sortByInput = allowedSortBy.includes(sortBy) ? sortBy : 'name';
-        const safeSortOrder = allowedSortOrder.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
+        let orderByClause;
 
-        // 2. Map the clean input to the fully qualified and unambiguous SQL column name
-        const sortColumnMap = {
-            name: 'p.name',
-            price: 'p.price',
-            stock_quantity: 'p.stock_quantity',
-            created_at: 'p.created_at'
-        };
-        const safeSortColumn = sortColumnMap[sortByInput];
+        // Special handling for discount sorting
+        if (sortBy === 'discount') {
+            // Order by the percentage discount, but only for active discounts. Non-discounted products are ranked last.
+            orderByClause = `ORDER BY CASE WHEN p.discount_price IS NOT NULL AND NOW() BETWEEN p.discount_start_date AND p.discount_end_date THEN ((p.price - p.discount_price) / p.price) ELSE -1 END ${safeSortOrder}`;
+        } else {
+            const safeSortBy = validSortColumns.includes(sortBy) ? `p.${sortBy}` : 'p.name';
+            orderByClause = `ORDER BY ${safeSortBy} ${safeSortOrder}`;
+        }
 
+        const whereClause = searchTerm ? `WHERE p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?` : '';
         const searchPattern = `%${searchTerm}%`;
 
-        // Build the WHERE clause for searching
-        const whereClause = `
-            WHERE (p.name LIKE ? OR
-                   p.description LIKE ? OR
-                   c.name LIKE ? OR
-                   u.company_name LIKE ? OR
-                   CONCAT(u.first_name, ' ', u.last_name) LIKE ?)
-        `;
-        const searchParams = [searchPattern, searchPattern, searchPattern, searchPattern, searchPattern];
+        const countSql = `SELECT COUNT(p.id) as total FROM products p JOIN categories c ON p.category_id = c.id ${whereClause}`;
+        const [countRows] = await db.query(countSql, searchTerm ? [searchPattern, searchPattern, searchPattern] : []);
+        const totalProducts = countRows[0].total;
 
-        // First, get the total count of all products for pagination metadata
-        const countSql = `
-            SELECT COUNT(*) as total
-            FROM products p
-            JOIN categories c ON p.category_id = c.id
-            JOIN users u ON p.provider_id = u.id
-            ${searchTerm ? whereClause : ''}
-        `;
-        const [[{ total }]] = await db.query(countSql, searchTerm ? searchParams : []);
-
-        // Then, get the paginated list of products
+        // The SELECT statement already includes the discount fields, which is correct.
         const productsSql = `
             SELECT
-                p.id, p.name, p.description, p.price, p.stock_quantity, p.created_at,
+                p.id, p.name, p.description, p.price, p.stock_quantity,
+                p.discount_price, p.discount_start_date, p.discount_end_date,
                 c.name as category_name,
                 u.first_name as provider_first_name,
                 u.last_name as provider_last_name,
@@ -377,17 +406,19 @@ const Product = {
             FROM products p
             JOIN categories c ON p.category_id = c.id
             JOIN users u ON p.provider_id = u.id
-            ${searchTerm ? whereClause : ''}
-            ORDER BY ?? ${safeSortOrder}
+            ${whereClause}
+            ${orderByClause}
             LIMIT ?
             OFFSET ?;
         `;
 
-        // Execute the query with the safe column name as a parameter
-        const queryParams = searchTerm ? [...searchParams, safeSortColumn, limit, offset] : [safeSortColumn, limit, offset];
-        const [products] = await db.query(productsSql, queryParams);
+        const finalQueryParams = searchTerm
+            ? [searchPattern, searchPattern, searchPattern, limit, offset]
+            : [limit, offset];
 
-        return { products, totalProducts: total };
+        const [products] = await db.query(productsSql, finalQueryParams);
+
+        return { products, totalProducts };
     },
 
     /**

@@ -60,6 +60,16 @@ function AdminProductManagementPage() {
         };
     }, [inputValue, currentSearch, currentSort, setSearchParams]);
 
+    const isDiscountActive = (p) => {
+        if (!p) return false;
+        const { discount_price, discount_start_date, discount_end_date, price } = p;
+        if (!discount_price || !discount_start_date || !discount_end_date) return false;
+        const now = new Date();
+        const start = new Date((discount_start_date || '').replace(' ', 'T'));
+        const end = new Date((discount_end_date || '').replace(' ', 'T'));
+        return !isNaN(start) && !isNaN(end) && now >= start && now <= end && Number(discount_price) < Number(price);
+    };
+
     const handleDelete = async (productId, productName) => {
         if (window.confirm(`Are you sure you want to delete "${productName}"? This action is permanent.`)) {
             try {
@@ -118,20 +128,36 @@ function AdminProductManagementPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {products.map(product => (
-                                    <tr key={product.id}>
-                                        <td>{product.id}</td>
-                                        <td>{product.name}</td>
-                                        <td>{product.category_name}</td>
-                                        <td>{product.provider_company_name || `${product.provider_first_name} ${product.provider_last_name}`}</td>
-                                        <td>${Number(product.price).toFixed(2)}</td>
-                                        <td>{product.stock_quantity}</td>
-                                        <td className="actions-cell">
-                                            <Link to={`/provider/edit-product/${product.id}`} className="action-btn edit-btn">{t('edit')}</Link>
-                                            <button onClick={() => handleDelete(product.id, product.name)} className="action-btn delete-btn">{t('delete')}</button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {products.map(product => {
+                                    const price = Number(product.price || 0);
+                                    const dprice = Number(product.discount_price || 0);
+                                    const active = isDiscountActive(product);
+                                    const pct = active && price > 0 ? Math.round(((price - dprice) / price) * 100) : 0;
+
+                                    return (
+                                        <tr key={product.id}>
+                                            <td>{product.id}</td>
+                                            <td>{product.name}</td>
+                                            <td>{product.category_name}</td>
+                                            <td>{product.provider_company_name || `${product.provider_first_name} ${product.provider_last_name}`}</td>
+                                            <td>
+                                                {active ? (
+                                                    <span className="price-cell">
+                                                        <span className="original-price">${price.toFixed(2)}</span>
+                                                        <span className="discounted-price">${dprice.toFixed(2)}</span>
+                                                    </span>
+                                                ) : (
+                                                    <span className="regular-price">${price.toFixed(2)}</span>
+                                                )}
+                                            </td>
+                                            <td>{product.stock_quantity}</td>
+                                            <td className="actions-cell">
+                                                <Link to={`/provider/edit-product/${product.id}`} className="action-btn edit-btn">{t('edit')}</Link>
+                                                <button onClick={() => handleDelete(product.id, product.name)} className="action-btn delete-btn">{t('delete')}</button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

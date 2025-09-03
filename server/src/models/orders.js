@@ -1,6 +1,31 @@
 const db = require('../config/db');
 const Cart = require('./cart');
 
+function parseMySQLDateTime(s) {
+    if (!s) return null;
+    if (typeof s === 'string') {
+        const normalized = s.includes('T') ? s : s.replace(' ', 'T');
+        const d = new Date(normalized);
+        return isNaN(d) ? null : d;
+    }
+    const d = new Date(s);
+    return isNaN(d) ? null : d;
+};
+
+function getEffectiveUnitPrice(item) {
+    const price = Number(item.price || 0);
+    const dprice = Number(item.discount_price || 0);
+    const start = parseMySQLDateTime(item.discount_start_date);
+    const end = parseMySQLDateTime(item.discount_end_date);
+    const now = new Date();
+    const active =
+        dprice > 0 &&
+        start && end &&
+        now >= start && now <= end &&
+        dprice < price;
+    return active ? dprice : price;
+};
+
 const Order = {
     async createFromCart(userId, { shippingAddressId, billingAddressId, totalAmount, stripeSessionId }) {
         const connection = await db.getConnection();
@@ -17,23 +42,31 @@ const Order = {
                 }
             }
 
-            // 2. Create the order
+            const calculatedTotal = cartItems.reduce((sum, item) => {
+                const unit = getEffectiveUnitPrice(item);
+                return sum + unit * item.quantity;
+            }, 0);
+
+            // 3. Create the order with calculated total (avoid trusting client total)
             const orderSql = 'INSERT INTO orders (user_id, shipping_address_id, billing_address_id, total_amount, stripe_session_id) VALUES (?, ?, ?, ?, ?)';
-            const [orderResult] = await connection.query(orderSql, [userId, shippingAddressId, billingAddressId, totalAmount, stripeSessionId]);
+            const [orderResult] = await connection.query(orderSql, [userId, shippingAddressId, billingAddressId, calculatedTotal, stripeSessionId]);
             const orderId = orderResult.insertId;
 
-            // 3. Create order items and update product stock
+            // 4. Create order items with price_at_purchase = effective unit price
             const orderItemSql = 'INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES ?';
-            const updateStockSql = 'UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?';
-
-            const orderItemsData = [];
-            for (const item of cartItems) {
-                orderItemsData.push([orderId, item.product_id, item.quantity, item.price]);
-                await connection.query(updateStockSql, [item.quantity, item.product_id]);
-            }
+            const orderItemsData = cartItems.map(item => {
+                const unit = getEffectiveUnitPrice(item);
+                return [orderId, item.product_id, item.quantity, unit];
+            });
             await connection.query(orderItemSql, [orderItemsData]);
 
-            // 4. Clear the user's cart
+            // 5. Update product stock
+            const updateStockSql = 'UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?';
+            for (const item of cartItems) {
+                await connection.query(updateStockSql, [item.quantity, item.product_id]);
+            }
+
+            // 6. Clear the user's cart
             await Cart.clear(userId, connection);
 
             await connection.commit();

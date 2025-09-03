@@ -17,6 +17,36 @@ const productController = {
                 return res.status(400).json({ message: "Missing productData or attributesData in request body." });
             }
 
+            // Basic validation
+            if (!productData.name || !productData.price || !productData.stock_quantity || !productData.category_id) {
+                return res.status(400).json({ message: "Missing required fields: name, price, stock, and category." });
+            }
+            // Discount validation
+            if (productData.discount_price && Number(productData.discount_price) >= Number(productData.price)) {
+                return res.status(400).json({ message: "Discount price must be less than original price." });
+            }
+
+            if (productData.discount_price && (!productData.discount_start_date || !productData.discount_end_date)) {
+                return res.status(400).json({ message: "Discount start and end date must be provided when setting a discount price." });
+            }
+
+            if ((productData.discount_start_date && !productData.discount_end_date) ||
+                (!productData.discount_start_date && productData.discount_end_date)) {
+                return res.status(400).json({ message: "Both discount start and end date must be provided." });
+            }
+
+            if (productData.discount_start_date && productData.discount_end_date) {
+                if (!productData.discount_price) {
+                    return res.status(400).json({ message: "Discount price must be provided when setting discount dates." });
+                }
+
+                const start = new Date(productData.discount_start_date.replace(' ', 'T'));
+                const end = new Date(productData.discount_end_date.replace(' ', 'T'));
+                if (isNaN(start) || isNaN(end) || start >= end) {
+                    return res.status(400).json({ message: "Invalid discount date range." });
+                }
+            }
+
             // IMPORTANT: Overwrite any provider_id in the body with the one from the token.
             productData.provider_id = provider_id;
 
@@ -39,6 +69,36 @@ const productController = {
 
             if (!productData || !attributesData) {
                 return res.status(400).json({ message: "Missing productData or attributesData." });
+            }
+
+            // Basic validation
+            if (!productData.name || !productData.price || !productData.stock_quantity || !productData.category_id) {
+                return res.status(400).json({ message: "Missing required fields: name, price, stock, and category." });
+            }
+            // Discount validation
+            if (productData.discount_price && Number(productData.discount_price) >= Number(productData.price)) {
+                return res.status(400).json({ message: "Discount price must be less than original price." });
+            }
+
+            if(productData.discount_price && (!productData.discount_start_date || !productData.discount_end_date)) {
+                return res.status(400).json({ message: "Discount start and end date must be provided when setting a discount price." });
+            }
+
+            if ((productData.discount_start_date && !productData.discount_end_date) ||
+                (!productData.discount_start_date && productData.discount_end_date)) {
+                return res.status(400).json({ message: "Both discount start and end date must be provided." });
+            }
+
+            if (productData.discount_start_date && productData.discount_end_date) {
+                if (!productData.discount_price) {
+                    return res.status(400).json({ message: "Discount price must be provided when setting discount dates." });
+                }
+
+                const start = new Date(productData.discount_start_date.replace(' ', 'T'));
+                const end = new Date(productData.discount_end_date.replace(' ', 'T'));
+                if (isNaN(start) || isNaN(end) || start >= end) {
+                    return res.status(400).json({ message: "Invalid discount date range." });
+                }
             }
 
             await Product.update(Number(id), user, productData, attributesData);

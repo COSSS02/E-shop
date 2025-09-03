@@ -64,6 +64,16 @@ function ProductDetailPage() {
         window.scrollTo(0, 0);
     }, [productId, token]);
 
+    const isDiscountActive = (p) => {
+        if (!p) return false;
+        const { discount_price, discount_start_date, discount_end_date, price } = p;
+        if (!discount_price || !discount_start_date || !discount_end_date) return false;
+        const now = new Date();
+        const start = new Date(discount_start_date);
+        const end = new Date(discount_end_date);
+        return !isNaN(start) && !isNaN(end) && now >= start && now <= end && Number(discount_price) < Number(price);
+    };
+
     if (loading) {
         return <div className="product-detail-container"><p>Loading...</p></div>;
     }
@@ -75,6 +85,13 @@ function ProductDetailPage() {
     if (!product) {
         return null; // Or a "Product not found" component
     }
+
+    const price = Number(product.price || 0);
+    const discountPrice = Number(product.discount_price || 0);
+    const activeDiscount = isDiscountActive(product);
+    const discountPercentage = activeDiscount && price > 0
+        ? Math.round(((price - discountPrice) / price) * 100)
+        : 0;
 
     const getImageUrl = (categoryName) => {
         if (!categoryName) {
@@ -150,7 +167,18 @@ function ProductDetailPage() {
                 <p className="product-description">{product.description}</p>
 
                 <div className="product-purchase-section">
-                    <span className="product-price-large">${product.price}</span>
+                    <div className="price-block">
+                        {activeDiscount ? (
+                            <div className="price-line">
+                                <span className="original-price-lg">${price.toFixed(2)}</span>
+                                <span className="discounted-price-lg">${discountPrice.toFixed(2)}</span>
+                                <span className="discount-badge-lg">-{discountPercentage}%</span>
+                            </div>
+                        ) : (
+                            <span className="product-price-large">${price.toFixed(2)}</span>
+                        )}
+                    </div>
+
                     <div className="purchase-actions">
                         <span className={`product-stock-status ${product.stock_quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
                             {product.stock_quantity > 0 ? t('in_stock') + `: ${product.stock_quantity}` : t('out_of_stock')}

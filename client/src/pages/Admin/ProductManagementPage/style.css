@@ -56,6 +56,28 @@
     background-color: #4a4a4a;
 }
 
+.price-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.regular-price {
+    color: #e67e22;
+    font-weight: 700;
+}
+
+.original-price {
+    color: #999;
+    text-decoration: line-through;
+    font-weight: normal;
+}
+
+.discounted-price {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
 .actions-cell {
     display: flex;
     gap: 0.5rem;

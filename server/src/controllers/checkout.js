@@ -4,6 +4,31 @@ const Cart = require('../models/cart');
 const User = require('../models/user');
 const Order = require('../models/orders');
 
+function parseMySQLDateTime(s) {
+    if (!s) return null;
+    if (typeof s === 'string') {
+        const normalized = s.includes('T') ? s : s.replace(' ', 'T');
+        const d = new Date(normalized);
+        return isNaN(d) ? null : d;
+    }
+    const d = new Date(s);
+    return isNaN(d) ? null : d;
+};
+
+function getEffectiveUnitPrice(item) {
+    const price = Number(item.price || 0);
+    const dprice = Number(item.discount_price || 0);
+    const start = parseMySQLDateTime(item.discount_start_date);
+    const end = parseMySQLDateTime(item.discount_end_date);
+    const now = new Date();
+    const active =
+        dprice > 0 &&
+        start && end &&
+        now >= start && now <= end &&
+        dprice < price;
+    return active ? dprice : price;
+};
+
 const checkoutController = {
     async createCheckoutSession(req, res) {
         try {
@@ -29,14 +54,17 @@ const checkoutController = {
                 console.log("Using existing Stripe customer:", stripeCustomerId);
             }
 
-            const line_items = cartItems.map(item => ({
-                price_data: {
-                    currency: 'usd',
-                    product_data: { name: item.name },
-                    unit_amount: Math.round(item.price * 100),
-                },
-                quantity: item.quantity,
-            }));
+            const line_items = cartItems.map(item => {
+                const unit = getEffectiveUnitPrice(item);
+                return {
+                    price_data: {
+                        currency: 'usd',
+                        product_data: { name: item.name },
+                        unit_amount: Math.round(unit * 100),
+                    },
+                    quantity: item.quantity,
+                };
+            });
 
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],

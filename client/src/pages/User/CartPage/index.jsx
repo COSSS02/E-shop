@@ -48,6 +48,16 @@ function CartPage() {
         if (token) fetchData();
     }, [token]);
 
+    const isDiscountActive = (p) => {
+        if (!p) return false;
+        const { discount_price, discount_start_date, discount_end_date, price } = p;
+        if (!discount_price || !discount_start_date || !discount_end_date) return false;
+        const now = new Date();
+        const start = new Date(discount_start_date);
+        const end = new Date(discount_end_date);
+        return !isNaN(start) && !isNaN(end) && now >= start && now <= end && Number(discount_price) < Number(price);
+    };
+
     const handleUpdateQuantity = async (productId, quantity) => {
         try {
             await updateCartItem(productId, quantity, token);
@@ -100,7 +110,11 @@ function CartPage() {
         }
     };
 
-    const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = cartItems.reduce((sum, item) => {
+        const active = isDiscountActive(item);
+        const unit = active ? Number(item.discount_price) : Number(item.price);
+        return sum + unit * item.quantity;
+    }, 0);
     const shippingAddresses = addresses.filter(a => a.address_type === 'shipping');
     const billingAddresses = addresses.filter(a => a.address_type === 'billing');
 
@@ -114,24 +128,41 @@ function CartPage() {
                 <p>{t('cart_empty')} <Link to="/">{t('go_shopping')}</Link></p>
             ) : (
                 <div className="cart-layout">
-                    <div className="cart-items-list">
-                        {cartItems.map(item => (
-                            <div key={item.product_id} className="cart-item">
-                                <div className="cart-item-info">
-                                    <Link to={`/products/${item.product_id}`}><h4>{item.name}</h4></Link>
-                                    <p>{t('price')}: <strong>${item.price}</strong></p>
-                                </div>
-                                <div className="cart-item-actions">
-                                    <QuantitySelector
-                                        initialQuantity={item.quantity}
-                                        maxQuantity={item.stock_quantity}
-                                        onQuantityChange={(newQuantity) => handleUpdateQuantity(item.product_id, newQuantity)}
-                                    />
-                                    <button className='remove-button' onClick={() => handleRemoveItem(item.product_id)}>{t('remove')}</button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                        <div className="cart-items-list">
+                            {cartItems.map(item => {
+                                const active = isDiscountActive(item);
+                                const price = Number(item.price || 0);
+                                const dprice = Number(item.discount_price || 0);
+                                const pct = active && price > 0 ? Math.round(((price - dprice) / price) * 100) : 0;
+
+                                return (
+                                    <div key={item.product_id} className="cart-item">
+                                        <div className="cart-item-info">
+                                            <Link to={`/products/${item.product_id}`}><h4>{item.name}</h4></Link>
+                                            <p>
+                                                {t('price')}:{" "}
+                                                {active ? (
+                                                    <span className="cart-item-price">
+                                                        <span className="original-price">${price.toFixed(2)}</span>
+                                                        <span className="discounted-price">${dprice.toFixed(2)}</span>
+                                                    </span>
+                                                ) : (
+                                                    <strong>${price.toFixed(2)}</strong>
+                                                )}
+                                            </p>
+                                        </div>
+                                        <div className="cart-item-actions">
+                                            <QuantitySelector
+                                                initialQuantity={item.quantity}
+                                                maxQuantity={item.stock_quantity}
+                                                onQuantityChange={(newQuantity) => handleUpdateQuantity(item.product_id, newQuantity)}
+                                            />
+                                            <button className='remove-button' onClick={() => handleRemoveItem(item.product_id)}>{t('remove')}</button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     <div className="cart-summary">
                         <h2>{t('order_summary')}</h2>
                         <p>{t('total')}: <strong>${total.toFixed(2)}</strong></p>
