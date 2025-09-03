@@ -323,6 +323,30 @@ const Order = {
     },
 
     /**
+     * (Admin) Deletes an order by its ID.
+     */
+    async deleteById(orderId) {
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            await connection.query('DELETE FROM order_items WHERE order_id = ?', [orderId]);
+            const [result] = await connection.query('DELETE FROM orders WHERE id = ?', [orderId]);
+            if (result.affectedRows === 0) {
+                throw new Error('Order not found.');
+            }
+
+            await connection.commit();
+            return true;
+        } catch (err) {
+            await connection.rollback();
+            throw err;
+        } finally {
+            connection.release();
+        }
+    },
+
+    /**
      * (Admin) Gets platform-wide sales statistics.
      */
     async getPlatformSalesStats() {

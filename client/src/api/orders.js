@@ -59,3 +59,12 @@ export const getAllOrders = async (page, sort, searchTerm, token) => {
     });
     return handleResponse(response);
 };
+
+export const deleteOrder = async (orderId, token) => {
+    const url = `/api/orders/${orderId}`;
+    const response = await fetch(url, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return handleResponse(response);
+};

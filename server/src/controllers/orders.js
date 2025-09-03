@@ -93,6 +93,16 @@ const orderController = {
         } catch (error) {
             res.status(500).json({ message: "Error retrieving all orders", error: error.message });
         }
+    },
+
+    async deleteOrder(req, res) {
+        try {
+            const { orderId } = req.params;
+            await Order.deleteById(Number(orderId));
+            res.status(200).json({ message: 'Order deleted successfully.' });
+        } catch (error) {
+            res.status(500).json({ message: error.message || 'Error deleting order' });
+        }
     }
 };
 

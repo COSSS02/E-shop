@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useToast } from '../../../contexts/ToastContext';
-import { getAllOrders, updateOrderItemStatus } from '../../../api/orders';
+import { getAllOrders, updateOrderItemStatus, deleteOrder } from '../../../api/orders';
 import Pagination from '../../../components/pagination/Pagination';
 import './style.css';
 
@@ -68,6 +68,21 @@ function AdminOrderManagementPage() {
         }
     };
 
+    const handleDeleteOrder = async (orderId) => {
+        if (!window.confirm('Delete this order?')) return;
+        try {
+            await deleteOrder(orderId, token);
+            setOrders(prev => prev.filter(o => o.id !== orderId));
+            if (pagination && orders.length === 1 && pagination.currentPage > 1) {
+                // If we deleted the last item on the page, go back one page
+                setSearchParams({ q: currentSearch, sort: currentSort, page: pagination.currentPage - 1 });
+            }
+            addToast('Order deleted.', 'success');
+        } catch (err) {
+            addToast(`Failed to delete order: ${err.message}`, 'error');
+        }
+    };
+
     return (
         <div className="admin-order-container">
             <h1>{t('order_management')}</h1>
@@ -89,6 +104,7 @@ function AdminOrderManagementPage() {
                                 key={order.id}
                                 order={order}
                                 onStatusChange={handleStatusChange}
+                                onDelete={handleDeleteOrder}
                             />
                         ))}
                     </div>
@@ -105,7 +121,7 @@ function AdminOrderManagementPage() {
     );
 }
 
-const OrderCard = ({ order, onStatusChange }) => {
+const OrderCard = ({ order, onStatusChange, onDelete }) => {
     const { t } = useTranslation();
     const [isExpanded, setIsExpanded] = useState(false);
     const statusOptions = ['Pending', 'Processing', 'Shipped', 'Cancelled'];
@@ -119,6 +135,13 @@ const OrderCard = ({ order, onStatusChange }) => {
                 <span className="order-address">{order.shipping_street}, {order.shipping_city}</span>
                 <span className="order-date">{new Date(order.created_at).toLocaleDateString()}</span>
                 <span className="order-total">${Number(order.total_amount).toFixed(2)}</span>
+                <button
+                    className="delete-order-btn"
+                    title={t('delete')}
+                    onClick={(e) => { e.stopPropagation(); onDelete(order.id); }}
+                >
+                    ✖
+                </button>
                 <span className="order-toggle">{isExpanded ? '▲' : '▼'}</span>
             </div>
             {isExpanded && (

@@ -17,5 +17,6 @@ router.patch('/items/:orderItemId', checkRole(['provider', 'admin']), orderContr
 
 // --- Admin-facing routes ---
 router.get('/all', checkRole(['admin']), orderController.getAllOrders);
+router.delete('/:orderId', checkRole(['admin']), orderController.deleteOrder);
 
 module.exports = router;
